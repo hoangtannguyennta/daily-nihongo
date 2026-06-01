@@ -1,0 +1,250 @@
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="display-5 fw-bold text-dark mb-1">Sổ tay cá nhân</h1>
+      <p class="text-muted">Nơi lưu trữ và theo dõi quá trình chinh phục từ vựng của bạn</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap justify-content-end">
+      <%= link_to vocabularies_path, class: "btn btn-light border shadow-sm rounded-pill px-3" do %>
+        <i class="bi bi-arrow-left"></i> Quay lại kho từ
+      <% end %>
+      <%= link_to progress_user_vocabularies_path, class: "btn btn-primary shadow-sm rounded-pill px-4" do %>
+        <i class="bi bi-bar-chart-line"></i> Xem thống kê
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 mb-4 overflow-hidden vocab-card">
+    <div class="card-body p-3 bg-white">
+      <div class="d-flex align-items-center gap-3 flex-wrap">
+        <span class="fw-bold text-muted small text-uppercase"><i class="bi bi-funnel me-1"></i> Lọc trạng thái:</span>
+        <div class="filter-pills">
+          <%= link_to "Tất cả", user_vocabularies_path, 
+              class: "filter-pill #{'active' if params[:status].blank?}" %>
+          <%= link_to "Chưa học", user_vocabularies_path(status: :not_learned), 
+              class: "filter-pill #{'active' if params[:status] == 'not_learned'}" %>
+          <%= link_to "Chưa thuộc", user_vocabularies_path(status: :not_remembered), 
+              class: "filter-pill #{'active' if params[:status] == 'not_remembered'}" %>
+          <%= link_to "Đã thuộc", user_vocabularies_path(status: :remembered), 
+              class: "filter-pill #{'active' if params[:status] == 'remembered'}" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 vocab-card">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 vocab-table">
+        <thead>
+          <tr>
+            <th class="ps-4 text-uppercase small fw-bold text-muted">Từ vựng</th>
+            <th class="text-uppercase small fw-bold text-muted">Ý nghĩa</th>
+            <th class="text-center text-uppercase small fw-bold text-muted">Ôn tập</th>
+            <th class="text-center text-uppercase small fw-bold text-muted">Bài học</th>
+            <th class="text-center text-uppercase small fw-bold text-muted">Trạng thái</th>
+            <th class="text-end pe-4 text-uppercase small fw-bold text-muted">Cập nhật</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if @user_vocabularies.any? %>
+            <% @user_vocabularies.each do |uv| %>
+              <tr class="vocab-row">
+                <td class="ps-4">
+                  <div class="d-flex flex-column">
+                    <span class="fw-bold fs-5 text-primary word-kanji"><%= uv.vocabulary.word %></span>
+                    <span class="small text-muted font-monospace"><%= uv.vocabulary.romaji %></span>
+                  </div>
+                </td>
+                <td><span class="fw-medium text-dark"><%= uv.vocabulary.meaning %></span></td>
+                <td class="text-center">
+                  <div class="btn-group btn-group-sm bg-light rounded-pill p-1">
+                    <% if uv.vocabulary.audio.attached? %>
+                      <button onclick="new Audio('<%= url_for(uv.vocabulary.audio) %>').play()" 
+                              class="btn btn-link text-primary p-1 mx-1" title="Nghe">
+                        <i class="bi bi-volume-up-fill fs-5"></i>
+                      </button>
+                    <% end %>
+                    <button class="btn btn-link text-secondary p-1 mx-1" 
+                            onclick="openDrawingModal('<%= uv.vocabulary.word %>')" title="Tập viết">
+                      <i class="bi bi-pencil-square fs-5"></i>
+                    </button>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <span class="badge bg-soft-primary text-primary rounded-pill px-3">Bài <%= uv.vocabulary.lesson.number %></span>
+                </td>
+                <td class="text-center">
+                  <div class="status-pill-group vocab-status-group" data-vocab-id="<%= uv.vocabulary.id %>">
+                    <button onclick="updateVocabStatus(<%= uv.vocabulary.id %>, 'not_learned')" 
+                            class="status-btn not-learned <%= 'active' if uv.status == 'not_learned' %>" title="Chưa học">
+                      <i class="bi bi-dash-circle"></i>
+                    </button>
+                    <button onclick="updateVocabStatus(<%= uv.vocabulary.id %>, 'not_remembered')" 
+                            class="status-btn not-remembered <%= 'active' if uv.status == 'not_remembered' %>" title="Chưa thuộc">
+                      <i class="bi bi-question-circle"></i>
+                    </button>
+                    <button onclick="updateVocabStatus(<%= uv.vocabulary.id %>, 'remembered')" 
+                            class="status-btn remembered <%= 'active' if uv.status == 'remembered' %>" title="Đã thuộc">
+                      <i class="bi bi-check-circle"></i>
+                    </button>
+                  </div>
+                </td>
+                <td class="text-end pe-4 text-muted small">
+                  <span data-bs-toggle="tooltip" title="<%= uv.updated_at.strftime("%H:%M %d/%m/%Y") %>">
+                    <%= time_ago_in_words(uv.updated_at) %> trước
+                  </span>
+                </td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="5" class="text-center py-5 text-muted">
+                Bạn chưa đánh dấu từ vựng nào trong danh sách này.
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <% if @user_vocabularies.respond_to?(:total_pages) && @user_vocabularies.total_pages > 1 %>
+      <div class="card-footer bg-white py-3">
+        <div class="d-flex justify-content-center">
+          <%= paginate @user_vocabularies %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Modal Tập Viết (Sử dụng chung) -->
+<div class="modal fade" id="drawingModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+      <div class="modal-header border-0 pt-4 px-4 pb-0">
+        <h5 class="modal-title fw-bold">Tập viết: <span id="modalWordTitle" class="text-primary"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="canvas-container position-relative d-inline-block shadow-sm mb-3" 
+             style="background: #fdfdfd; border: 2px dashed #dee2e6; border-radius: 15px;">
+          <canvas id="writingCanvas" width="400" height="300" style="cursor: crosshair; touch-action: none;"></canvas>
+        </div>
+        <div class="d-flex justify-content-center gap-2 mb-3">
+          <button class="btn btn-light border fw-bold px-4 rounded-pill" onclick="clearCanvas()">
+            <i class="bi bi-eraser-fill me-1"></i> Xóa bảng
+          </button>
+          <button class="btn btn-primary fw-bold px-4 rounded-pill" data-bs-dismiss="modal">Xong</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .vocab-row { transition: all 0.2s; }
+  .vocab-row:hover { background-color: #f8fafc !important; }
+  
+  .filter-pills { display: flex; gap: 0.5rem; }
+  .filter-pill {
+    text-decoration: none;
+    padding: 0.4rem 1rem;
+    border-radius: 50rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #64748b;
+    background: #f1f5f9;
+    transition: all 0.2s;
+  }
+  .filter-pill:hover { background: #e2e8f0; color: #1e293b; }
+  .filter-pill.active { background: #1e293b; color: white; }
+
+  .bg-soft-primary { background-color: #e0e7ff; color: #4338ca; }
+  
+  /* Reuse Status Pill Styles */
+  .status-pill-group {
+    display: inline-flex;
+    background-color: #f1f5f9;
+    padding: 0.2rem;
+    border-radius: 50rem;
+  }
+  .status-btn {
+    border: none;
+    background: transparent;
+    color: #94a3b8;
+    padding: 0.2rem 0.5rem;
+    border-radius: 50rem;
+    transition: all 0.2s;
+  }
+  .status-btn.active {
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .status-btn.active.not-learned { color: #64748b; }
+  .status-btn.active.not-remembered { color: #f59e0b; }
+  .status-btn.active.remembered { color: #10b981; }
+
+  .canvas-container:after {
+    content: ""; position: absolute; top: 50%; left: 0; right: 0;
+    border-top: 1px dotted #e2e8f0; pointer-events: none;
+  }
+  .canvas-container:before {
+    content: ""; position: absolute; left: 50%; top: 0; bottom: 0;
+    border-left: 1px dotted #e2e8f0; pointer-events: none;
+  }
+</style>
+
+<script>
+  // Tương tự logic cập nhật AJAX ở trang index chính
+  window.updateVocabStatus = function(vocabId, status) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    fetch('/user_vocabularies/update_status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+      body: JSON.stringify({ vocabulary_id: vocabId, status: status })
+    })
+    .then(r => r.json())
+    .then(data => {
+      const group = document.querySelector(`.vocab-status-group[data-vocab-id="${vocabId}"]`);
+      if (group) {
+        const btns = group.querySelectorAll('.status-btn');
+        btns.forEach(b => b.classList.remove('active'));
+        if (data.status === 'not_learned') btns[0].classList.add('active');
+        else if (data.status === 'not_remembered') btns[1].classList.add('active');
+        else if (data.status === 'remembered') btns[2].classList.add('active');
+      }
+    });
+  }
+
+  // Logic Canvas cơ bản để modal Tập viết hoạt động
+  window.openDrawingModal = function(word) {
+    document.getElementById('modalWordTitle').textContent = word;
+    const modal = new bootstrap.Modal(document.getElementById('drawingModal'));
+    modal.show();
+    setTimeout(() => {
+      const canvas = document.getElementById('writingCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.font = "100px sans-serif";
+      ctx.fillStyle = "#f1f5f9";
+      ctx.textAlign = "center";
+      ctx.fillText(word, canvas.width/2, canvas.height/2 + 35);
+      
+      let drawing = false;
+      canvas.onmousedown = (e) => { drawing = true; ctx.beginPath(); ctx.lineWidth = 3; ctx.strokeStyle = '#334155'; };
+      canvas.onmousemove = (e) => { 
+        if(!drawing) return;
+        const rect = canvas.getBoundingClientRect();
+        ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+        ctx.stroke();
+      };
+      canvas.onmouseup = () => drawing = false;
+    }, 500);
+  }
+
+  window.clearCanvas = function() {
+    const canvas = document.getElementById('writingCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillText(document.getElementById('modalWordTitle').textContent, canvas.width/2, canvas.height/2 + 35);
+  }
+</script>

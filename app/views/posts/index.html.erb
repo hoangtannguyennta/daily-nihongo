@@ -1,16 +1,60 @@
-<p style="color: green"><%= notice %></p>
-
-<% content_for :title, "Posts" %>
-
-<h1>Posts</h1>
-
-<div id="posts">
-  <% @posts.each do |post| %>
-    <%= render post %>
-    <p>
-      <%= link_to "Show this post", post %>
-    </p>
+<div class="container py-5">
+  <% if notice.present? %>
+    <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+      <%= notice %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
   <% end %>
-</div>
 
-<%= link_to "New post", new_post_path %>
+  <% content_for :title, "Posts" %>
+
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+      <h1 class="display-4 fw-bold text-dark">Blog Posts</h1>
+      <p class="lead text-muted">Chia sẻ những suy nghĩ và kiến thức của bạn với mọi người.</p>
+    </div>
+    <%= link_to "New post", new_post_path, class: "btn btn-primary btn-lg shadow-sm rounded-pill px-4" %>
+  </div>
+
+  <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light border-bottom">
+          <tr>
+            <th class="ps-4 py-3 text-uppercase fs-7 fw-bold text-muted">Tiêu đề</th>
+            <th class="py-3 text-uppercase fs-7 fw-bold text-muted">Nội dung tóm tắt</th>
+            <th class="py-3 text-uppercase fs-7 fw-bold text-muted text-center">Ngày tạo</th>
+            <th class="pe-4 py-3 text-uppercase fs-7 fw-bold text-muted text-end">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody id="posts">
+          <% if @posts.any? %>
+            <% @posts.each do |post| %>
+              <tr>
+                <td class="ps-4 py-3 fw-semibold text-dark"><%= post.title %></td>
+                <td class="py-3 text-muted"><%= truncate(post.content, length: 60) %></td>
+                <td class="py-3 text-center text-muted small"><%= post.created_at.strftime("%d/%m/%Y") %></td>
+                <td class="pe-4 py-3 text-end">
+                  <div class="btn-group" role="group">
+                    <%= link_to "Xem", post, class: "btn btn-sm btn-outline-primary" %>
+                    <%= link_to "Sửa", edit_post_path(post), class: "btn btn-sm btn-outline-secondary" %>
+                    <%= link_to "Xóa", post, data: { turbo_method: :delete, turbo_confirm: "Bạn có chắc chắn?" }, class: "btn btn-sm btn-outline-danger" %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="4" class="py-5 text-center bg-light text-muted">
+                <div class="py-4">
+                  <p class="fs-5 mb-3">Chưa có bài viết nào ở đây.</p>
+                  <%= link_to "Hãy viết bài đầu tiên ngay!", new_post_path, class: "btn btn-outline-primary btn-sm" %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

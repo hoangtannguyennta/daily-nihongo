@@ -1,0 +1,147 @@
+<div class="container py-5">
+  <% if notice %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <%= notice %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% end %>
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="header-title">
+      <h1 class="display-6 fw-bold text-dark mb-1">Kho Kanji</h1>
+      <p class="text-muted mb-0">Học và tra cứu chữ Hán theo cấp độ JLPT</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap justify-content-end">
+      <%= link_to quiz_kanjis_path(jlpt_level: params[:jlpt_level], query: params[:query]), class: "btn btn-soft-success rounded-pill px-3 shadow-sm" do %>
+        <i class="bi bi-controller"></i> Luyện tập nhanh
+      <% end %>
+      <%= link_to new_kanji_path, class: "btn btn-primary rounded-pill shadow-sm px-3" do %>
+        <i class="bi bi-plus-lg"></i> Thêm Kanji
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 mb-4 rounded-4 vocab-card">
+    <div class="card-body p-3">
+      <%= form_with url: kanjis_path, method: :get, class: "row g-3 align-items-end" do |f| %>
+        <div class="col-md-5">
+          <div class="d-flex align-items-center search-wrapper">
+            <i class="bi bi-search text-muted me-2"></i>
+            <%= f.text_field :query, value: params[:query], 
+                class: "form-control border-0 bg-transparent shadow-none", 
+                placeholder: "Tìm Kanji, ý nghĩa, Onyomi, Kunyomi..." %>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <%= f.select :jlpt_level, ["N5", "N4", "N3", "N2", "N1"],
+              { include_blank: "Tất cả cấp độ", selected: params[:jlpt_level] }, 
+              { class: "form-select filter-select-custom shadow-none", onchange: "this.form.requestSubmit()" } %>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+          <button type="submit" class="btn btn-dark w-100 fw-bold rounded-pill shadow-sm px-4">Tìm kiếm</button>
+          <%= link_to "Xóa lọc", kanjis_path, class: "btn btn-outline-secondary w-100 rounded-pill px-4" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 vocab-card">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 vocab-table">
+        <thead>
+          <tr>
+            <th class="ps-4 text-uppercase small fw-bold text-muted" style="width: 120px;">Hán tự</th>
+            <th class="text-center text-uppercase small fw-bold text-muted">Công cụ</th>
+            <th class="text-uppercase small fw-bold text-muted">Âm đọc (On/Kun)</th>
+            <th class="text-uppercase small fw-bold text-muted">Ý nghĩa</th>
+            <th class="text-center text-uppercase small fw-bold text-muted">Cấp độ</th>
+            <th class="text-center text-uppercase small fw-bold text-muted">Số nét</th>
+            <th class="text-end pe-4 text-uppercase small fw-bold text-muted">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if @kanjis.any? %>
+            <% @kanjis.each do |kanji| %>
+            <tr class="vocab-row">
+              <td class="ps-4">
+                <span class="fw-bold fs-2 text-primary"><%= kanji.character %></span>
+              </td>
+              <td class="text-center">
+                <div class="btn-group btn-group-sm bg-light rounded-pill p-1">
+                  <button class="btn btn-link text-secondary p-1 mx-1" 
+                          onclick="openDrawingModal('<%= kanji.character %>')" title="Tập viết">
+                    <i class="bi bi-pencil-square fs-5"></i>
+                  </button>
+                  <button class="btn btn-link text-info p-1 mx-1" 
+                          onclick="openFlashcardModal('<%= kanji.character %>', '<%= kanji.meaning %>', '<%= kanji.onyomi %> / <%= kanji.kunyomi %>')" title="Thẻ ghi nhớ">
+                    <i class="bi bi-card-text fs-5"></i>
+                  </button>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex flex-column">
+                  <small class="text-danger">On: <%= kanji.onyomi %></small>
+                  <small class="text-success">Kun: <%= kanji.kunyomi %></small>
+                </div>
+              </td>
+              <td><span class="fw-medium text-dark"><%= kanji.meaning %></span></td>
+              <td class="text-center">
+                <span class="badge bg-soft-primary text-primary rounded-pill px-3"><%= kanji.jlpt_level %></span>
+              </td>
+              <td class="text-center">
+                <small class="text-muted"><%= kanji.stroke_count %> nét</small>
+              </td>
+              <td class="text-end pe-4 action-cell">
+                <div class="dropdown">
+                  <button class="btn btn-light btn-sm rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-three-dots-vertical"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                    <li>
+                      <%= link_to edit_kanji_path(kanji), class: "dropdown-item text-primary" do %>
+                        <i class="bi bi-pencil-square me-2"></i> Chỉnh sửa
+                      <% end %>
+                    </li>
+                    <li>
+                      <%= button_to kanji, method: :delete, 
+                          form: { data: { turbo_confirm: "Xóa Kanji '#{kanji.character}'?" } },
+                          class: "dropdown-item text-danger border-0 bg-transparent w-100 text-start" do %>
+                        <i class="bi bi-trash3 me-2"></i> Xóa
+                      <% end %>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+          <% else %>
+            <tr>
+              <td colspan="7" class="text-center py-5 text-muted">Không tìm thấy Kanji nào.</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <% if @kanjis.any? %>
+      <div class="card-footer bg-white border-top-0 py-3">
+        <div class="d-flex justify-content-center">
+          <%= paginate @kanjis %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Modal Luyện Viết & Flashcard (Sử dụng chung JS từ Vocabularies) -->
+<%= render 'shared/study_modals' %>
+
+<style>
+  /* Tái sử dụng style từ Vocabularies */
+  .bg-soft-primary { background-color: #e0e7ff; }
+  .btn-soft-success { background-color: #d1fae5; color: #065f46; border: none; }
+  .btn-soft-success:hover { background-color: #10b981; color: white; }
+  .vocab-row:hover { background-color: #fcfdfe !important; }
+  .vocab-card { border-radius: 15px; }
+  .search-wrapper { background: #f8f9fa; padding: 5px 15px; border-radius: 50px; border: 1px solid #eee; }
+</style>

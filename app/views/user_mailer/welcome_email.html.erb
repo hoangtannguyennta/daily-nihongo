@@ -1,0 +1,11 @@
+<h1>Xin chào <%= @user.email %></h1>
+
+<p>Chào mừng bạn đến với hệ thống học tiếng Nhật.</p>
+
+<div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+  <p style="font-size: 14px; color: #4b5563; margin-bottom: 10px;">Mã xác nhận của bạn là:</p>
+  <h2 style="font-size: 32px; letter-spacing: 5px; color: #4f46e5; margin: 0;"><%= @user.otp_code %></h2>
+</div>
+
+<p>Vui lòng nhập mã này vào trang xác thực để kích hoạt tài khoản.</p>
+<p>Cảm ơn bạn!</p>

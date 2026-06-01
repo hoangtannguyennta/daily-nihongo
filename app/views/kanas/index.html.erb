@@ -1,0 +1,302 @@
+<div class="container py-4">
+  <div class="text-center mb-5">
+    <h1 class="display-4 fw-bold text-primary">Bảng Chữ Cái Tiếng Nhật</h1>
+    <p class="lead text-muted">Học Hiragana và Katakana một cách dễ dàng</p>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <ul class="nav nav-pills mb-4 justify-content-center" id="kanaTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active px-4 py-2 fw-bold" id="hiragana-tab" data-bs-toggle="pill" data-bs-target="#hiragana" type="button">
+        Hiragana (あ)
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link px-4 py-2 fw-bold" id="katakana-tab" data-bs-toggle="pill" data-bs-target="#katakana" type="button">
+        Katakana (ア)
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link px-4 py-2 fw-bold" id="quiz-tab" data-bs-toggle="pill" data-bs-target="#quiz" type="button">
+        Luyện tập (Quiz)
+      </button>
+    </li>
+  </ul>
+
+  <!-- Tab Content -->
+  <div class="tab-content" id="kanaTabsContent">
+
+    <!-- Hiragana -->
+    <div class="tab-pane fade show active" id="hiragana">
+      <div class="row g-3">
+        <% @hiragana.each do |kana| %>
+
+          <% is_y_row = ["ya", "yu", "yo"].include?(kana.romaji) %>
+          <% col_class = is_y_row ? "col-4" : "col-5-custom" %>
+
+          <div class="<%= col_class %>">
+            <div class="card h-100 text-center shadow-sm border-0 hover-shadow transition">
+              <button class="btn btn-link p-0 position-absolute top-0 end-0 m-1 text-decoration-none writing-trigger" onclick="openWritingModal('<%= kana.character %>')" title="Luyện viết">
+                <i class="bi bi-pencil-square text-muted"></i>
+              </button>
+              <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                <span class="display-5 mb-1 fw-normal text-dark">
+                  <%= kana.character %>
+                </span>
+                <span class="text-muted small text-uppercase ls-wide">
+                  <%= kana.romaji %>
+                </span>
+              </div>
+            </div>
+          </div>
+
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Katakana -->
+    <div class="tab-pane fade" id="katakana">
+      <div class="row g-3">
+        <% @katakana.each do |kana| %>
+
+          <% is_y_row = ["ya", "yu", "yo"].include?(kana.romaji) %>
+          <% col_class = is_y_row ? "col-4" : "col-5-custom" %>
+
+          <div class="<%= col_class %>">
+            <div class="card h-100 text-center shadow-sm border-0 hover-shadow transition bg-light-subtle">
+              <button class="btn btn-link p-0 position-absolute top-0 end-0 m-1 text-decoration-none writing-trigger" onclick="openWritingModal('<%= kana.character %>')" title="Luyện viết">
+                <i class="bi bi-pencil-square text-muted"></i>
+              </button>
+              <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                <span class="display-5 mb-1 fw-normal text-info">
+                  <%= kana.character %>
+                </span>
+                <span class="text-muted small text-uppercase ls-wide">
+                  <%= kana.romaji %>
+                </span>
+              </div>
+            </div>
+          </div>
+
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Quiz Section -->
+    <div class="tab-pane fade" id="quiz">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card shadow border-0 text-center p-4">
+            <div id="quiz-setup" class="py-3">
+              <h3 class="mb-4">Sẵn sàng ôn tập?</h3>
+              <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <button onclick="startQuiz('hiragana')" class="btn btn-outline-primary btn-lg px-4">Luyện Hiragana</button>
+                <button onclick="startQuiz('katakana')" class="btn btn-outline-info btn-lg px-4">Luyện Katakana</button>
+              </div>
+            </div>
+            
+            <div id="quiz-container" class="d-none">
+              <div class="mb-4">
+                <span class="text-muted small d-block mb-2">Chọn Romaji đúng cho chữ:</span>
+                <h2 id="question-char" class="display-1 fw-bold text-primary mb-3">あ</h2>
+              </div>
+              
+              <div id="options-grid" class="row g-2">
+                <!-- Options will be injected here -->
+              </div>
+
+              <div id="quiz-feedback" class="mt-4 d-none">
+                <div class="alert mb-3" id="feedback-alert"></div>
+                <button onclick="nextQuestion()" class="btn btn-outline-secondary w-100">Câu tiếp theo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal Luyện Viết -->
+  <div class="modal fade" id="writingModal" tabindex="-1" aria-labelledby="writingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold" id="writingModalLabel">Luyện viết: <span id="writing-target-char" class="text-primary fs-3"></span></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center pt-2">
+          <div class="writing-canvas-container border rounded bg-white shadow-inner mb-3 mx-auto" style="width: 300px; height: 300px; position: relative; cursor: crosshair;">
+            <span id="writing-guide-char" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 180px; opacity: 0.1; pointer-events: none; user-select: none;"></span>
+            <canvas id="writing-canvas" width="300" height="300"></canvas>
+          </div>
+          <div class="d-flex justify-content-center gap-2">
+            <button type="button" class="btn btn-outline-secondary px-4" onclick="clearWritingCanvas()">
+              <i class="bi bi-eraser-fill me-1"></i> Xóa bảng
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .col-5-custom {
+    flex: 0 0 auto;
+    width: 20%;
+  }
+
+  .transition { 
+    transition: all 0.3s ease; 
+  }
+
+  .hover-shadow:hover { 
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+  }
+
+  .ls-wide {
+    letter-spacing: 1px;
+  }
+
+  /* Đảm bảo hiển thị tốt trên thiết bị di động nếu cần */
+  @media (max-width: 576px) {
+    .col-5-custom {
+      width: 33.333333%; /* Chuyển sang 3 cột trên màn hình rất nhỏ để dễ nhìn hơn */
+    }
+  }
+
+  .option-btn {
+    padding: 15px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: all 0.2s ease;
+  }
+
+  .writing-trigger {
+    opacity: 0.4;
+    transition: all 0.2s;
+    z-index: 10;
+  }
+
+  .card:hover .writing-trigger {
+    opacity: 1;
+  }
+
+  .writing-trigger:hover i {
+    color: #0d6efd !important;
+    transform: scale(1.1);
+  }
+
+  .shadow-inner {
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  }
+</style>
+
+<script>
+  // Gán vào window để tránh lỗi redeclaration khi Turbo load lại trang
+  window.kanaQuizCorrect = null;
+  window.kanaQuizCanAnswer = true;
+  window.kanaQuizSelectedKind = '';
+  window.writingCanvasObj = null;
+  window.writingCtx = null;
+  window.isDrawing = false;
+
+  window.openWritingModal = function(char) {
+    document.getElementById('writing-target-char').innerText = char;
+    document.getElementById('writing-guide-char').innerText = char;
+    
+    const modalEl = document.getElementById('writingModal');
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+
+    // Đợi modal hiển thị xong mới khởi tạo canvas để đảm bảo tọa độ chính xác
+    setTimeout(() => window.initWritingCanvas(), 300);
+  }
+
+  window.initWritingCanvas = function() {
+    window.writingCanvasObj = document.getElementById('writing-canvas');
+    window.writingCtx = window.writingCanvasObj.getContext('2d');
+    
+    window.writingCtx.lineWidth = 8;
+    window.writingCtx.lineCap = 'round';
+    window.writingCtx.lineJoin = 'round';
+    window.writingCtx.strokeStyle = '#333';
+
+    window.clearWritingCanvas();
+
+    // Sự kiện chuột
+    window.writingCanvasObj.onmousedown = (e) => { window.isDrawing = true; window.draw(e); };
+    window.writingCanvasObj.onmousemove = (e) => { window.draw(e); };
+    window.addEventListener('mouseup', () => { window.isDrawing = false; if(window.writingCtx) window.writingCtx.beginPath(); });
+    
+    // Sự kiện cảm ứng (Mobile)
+    window.writingCanvasObj.ontouchstart = (e) => { e.preventDefault(); window.isDrawing = true; window.draw(e.touches[0]); };
+    window.writingCanvasObj.ontouchmove = (e) => { e.preventDefault(); window.draw(e.touches[0]); };
+    window.writingCanvasObj.ontouchend = () => { window.isDrawing = false; if(window.writingCtx) window.writingCtx.beginPath(); };
+  }
+
+  window.draw = function(e) {
+    if (!window.isDrawing) return;
+    const rect = window.writingCanvasObj.getBoundingClientRect();
+    const x = (e.clientX || e.pageX) - rect.left;
+    const y = (e.clientY || e.pageY) - rect.top;
+
+    window.writingCtx.lineTo(x, y);
+    window.writingCtx.stroke();
+    window.writingCtx.beginPath();
+    window.writingCtx.moveTo(x, y);
+  }
+
+  window.clearWritingCanvas = function() {
+    if (window.writingCtx) window.writingCtx.clearRect(0, 0, window.writingCanvasObj.width, window.writingCanvasObj.height);
+  }
+
+  window.startQuiz = function(kind) {
+    window.kanaQuizSelectedKind = kind;
+    document.getElementById('quiz-setup').classList.add('d-none');
+    document.getElementById('quiz-container').classList.remove('d-none');
+    nextQuestion();
+  }
+
+  window.nextQuestion = async function() {
+    window.kanaQuizCanAnswer = true;
+    document.getElementById('quiz-feedback').classList.add('d-none');
+    const grid = document.getElementById('options-grid');
+    grid.innerHTML = '<div class="col-12"><div class="spinner-border text-primary" role="status"></div></div>';
+    
+    try {
+      const response = await fetch(`/kanas/quiz.json?kind=${window.kanaQuizSelectedKind}`);
+      const data = await response.json();
+
+      window.kanaQuizCorrect = { char: data.question, romaji: data.correct };
+      document.getElementById('question-char').innerText = data.question;
+
+      grid.innerHTML = data.options.map(opt => `
+        <div class="col-6">
+          <button class="btn btn-outline-primary w-100 option-btn" onclick="checkAnswer('${opt}', this)">
+            ${opt.toUpperCase()}
+          </button>
+        </div>
+      `).join('');
+    } catch (error) {
+      console.error("Lỗi khi tải dữ liệu quiz:", error);
+      grid.innerHTML = '<div class="col-12 text-danger">Không thể tải câu hỏi.</div>';
+    }
+  }
+
+  window.checkAnswer = function(selected, btn) {
+    if (!window.kanaQuizCanAnswer) return;
+    window.kanaQuizCanAnswer = false;
+
+    const feedback = document.getElementById('quiz-feedback');
+    const alert = document.getElementById('feedback-alert');
+    feedback.classList.remove('d-none');
+
+    const isCorrect = selected === window.kanaQuizCorrect.romaji;
+    btn.classList.replace('btn-outline-primary', isCorrect ? 'btn-success' : 'btn-danger');
+    alert.className = `alert ${isCorrect ? 'alert-success' : 'alert-danger'}`;
+    alert.innerText = isCorrect ? 'Chính xác! Giỏi lắm!' : `Sai rồi! Đáp án đúng là: ${window.kanaQuizCorrect.romaji.toUpperCase()}`;
+  }
+</script>

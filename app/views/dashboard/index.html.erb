@@ -1,0 +1,283 @@
+<% content_for :head do %>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<% end %>
+
+<% weekdays = {
+  "Monday" => "Thứ 2",
+  "Tuesday" => "Thứ 3",
+  "Wednesday" => "Thứ 4",
+  "Thursday" => "Thứ 5",
+  "Friday" => "Thứ 6",
+  "Saturday" => "Thứ 7",
+  "Sunday" => "Chủ nhật"
+} %>
+
+<div class="container py-5">
+  <header class="mb-5 d-flex justify-content-between align-items-end">
+    <div>
+      <span class="badge bg-primary mb-2 px-3 shadow-sm text-uppercase" style="letter-spacing: 1px;">Học viên</span>
+      <h1 class="display-6 fw-bold text-dark mb-1">Chào, <%= current_user.email.split('@').first %>! 👋</h1>
+        <p class="text-secondary fs-5 mb-0">
+            <%= "#{weekdays[Time.now.strftime("%A")]}, ngày #{Time.now.strftime("%d tháng %m")}" %>
+        </p>
+    </div>
+    <div class="d-none d-md-block">
+      <div class="card border-0 shadow-sm rounded-4 px-4 py-2 bg-white">
+        <div class="d-flex align-items-center">
+          <i class="bi bi-fire text-warning fs-3 me-2"></i>
+          <div>
+            <div class="fw-bold text-dark"><%= @streak_count %> Ngày liên tiếp</div>
+            <div class="small text-muted text-end"><%= @streak_count > 0 ? "Tuyệt vời!" : "Bắt đầu ngay!" %></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hàng tổng hợp thành tích (Mới) -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-6 col-xl-8">
+      <div class="card border-0 rounded-4 p-4 text-white shadow-sm h-100" style="background: var(--primary-gradient);">
+        <div class="row align-items-center h-100">
+          <div class="col-12 col-lg-8">
+            <h2 class="h4 fw-bold mb-4">Tổng quan mục tiêu N5</h2>
+            
+            <!-- Tiến độ Trắc nghiệm -->
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="small fw-medium opacity-75">Hoàn thành trắc nghiệm từ vựng</span>
+                <span class="small fw-bold"><%= @successful_lessons_count %>/<%= Lesson.count %> bài</span>
+              </div>
+              <div class="progress bg-white bg-opacity-25" style="height: 8px; border-radius: 10px;">
+                <div class="progress-bar bg-white" role="progressbar" style="width: <%= @quiz_progress %>%; border-radius: 10px;"></div>
+              </div>
+            </div>
+
+            <!-- Tiến độ Từ vựng (@progress) -->
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="small fw-medium opacity-75">Đã thuộc từ vựng</span>
+                <span class="small fw-bold"><%= @progress %>% (<%= @known %>/<%= @total %>)</span>
+              </div>
+              <div class="progress bg-white bg-opacity-25" style="height: 8px; border-radius: 10px;">
+                <div class="progress-bar bg-white" role="progressbar" style="width: <%= @progress %>%; border-radius: 10px;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 d-none d-lg-block text-center">
+            <i class="bi bi-rocket-takeoff display-1 opacity-50"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+      <div class="card border-0 rounded-4 p-4 text-white shadow-sm h-100" style="background: var(--info-gradient);">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <h6 class="text-uppercase fw-bold opacity-75 mb-1">Tổng điểm tích lũy</h6>
+            <h2 class="display-5 fw-bold mb-0"><%= @total_score || 0 %></h2>
+            <%= link_to "Chi tiết bảng điểm →", total_score_user_vocabularies_path, class: "text-white text-decoration-none small opacity-75 hover-opacity-100" %>
+          </div>
+          <i class="bi bi-trophy-fill display-4 opacity-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bảng thống kê chi tiết từ vựng -->
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5">
+    <div class="col">
+      <div class="card dashboard-card h-100 p-3">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-3">
+            <div class="stat-icon-box bg-primary bg-opacity-10 text-primary">
+              <i class="bi bi-book"></i>
+            </div>
+            <div>
+              <p class="small text-muted mb-0 fw-medium">Tổng từ vựng</p>
+              <h3 class="fw-bold mb-0 text-dark"><%= @total %></h3>
+            </div>
+          </div>
+          <%= link_to quiz_vocabularies_path, class: "btn btn-outline-primary btn-sm border-0 rounded-circle", title: "Luyện tập tất cả từ vựng" do %>
+            <i class="bi bi-controller fs-4"></i>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card dashboard-card h-100 p-3">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-3">
+            <div class="stat-icon-box bg-success bg-opacity-10 text-success">
+              <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <div>
+              <p class="small text-muted mb-0 fw-medium">Đã thuộc</p>
+              <h3 class="fw-bold mb-0 text-success"><%= @known %></h3>
+            </div>
+          </div>
+          <%= link_to quiz_vocabularies_path(filter: 'remembered'), class: "btn btn-outline-success btn-sm border-0 rounded-circle", title: "Làm Quiz ôn tập từ đã thuộc" do %>
+            <i class="bi bi-controller fs-4"></i>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card dashboard-card h-100 p-3">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-3">
+            <div class="stat-icon-box bg-warning bg-opacity-10 text-warning">
+              <i class="bi bi-clock-history"></i>
+            </div>
+            <div>
+              <p class="small text-muted mb-0 fw-medium">Đang học</p>
+              <h3 class="fw-bold mb-0 text-warning"><%= @unknown %></h3>
+            </div>
+          </div>
+          <%= link_to quiz_vocabularies_path(filter: 'not_remembered'), class: "btn btn-outline-warning btn-sm border-0 rounded-circle", title: "Luyện tập ngay các từ đang học" do %>
+            <i class="bi bi-controller fs-4"></i>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card dashboard-card h-100 p-3">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-3">
+            <div class="stat-icon-box bg-secondary bg-opacity-10 text-secondary">
+              <i class="bi bi-slash-circle"></i>
+            </div>
+            <div>
+              <p class="small text-muted mb-0 fw-medium">Chưa học</p>
+              <h3 class="fw-bold mb-0 text-muted"><%= @not_learned %></h3>
+            </div>
+          </div>
+          <%= link_to quiz_vocabularies_path(filter: 'not_learned'), class: "btn btn-outline-secondary btn-sm border-0 rounded-circle", title: "Học các từ mới chưa bắt đầu" do %>
+            <i class="bi bi-controller fs-4"></i>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-5">
+    <!-- Biểu đồ phân bổ từ vựng -->
+    <div class="col-lg-4">
+      <div class="card dashboard-card h-100 p-4 border-0">
+        <h2 class="h5 fw-bold mb-4 text-dark">Phân bổ học tập</h2>
+        <div style="max-height: 250px;">
+          <canvas id="learningChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tiến độ học tập & Thử thách -->
+    <div class="col-lg-8">
+      <div class="card dashboard-card h-100 p-4 p-md-5 border-0">
+        <div class="row align-items-center h-100">
+          <div class="col-md-7">
+            <h2 class="h4 fw-bold mb-4 text-dark">Kết quả trắc nghiệm</h2>
+            <div class="d-flex justify-content-between align-items-end mb-2">
+              <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3 py-2 fw-bold">
+                <%= @quiz_progress %>% Hoàn thành
+              </span>
+              <span class="small fw-bold text-primary">
+                <%= @successful_lessons_count %> / <%= Lesson.count %> Bài tập đã xong
+              </span>
+            </div>
+            <div class="progress mb-4" style="height: 12px; border-radius: 10px; background-color: #edf2f7;">
+              <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                   role="progressbar" 
+                   style="width: <%= @quiz_progress %>%; border-radius: 10px;"></div>
+            </div>
+            
+            <% if @daily_lesson %>
+              <%= link_to vocabularies_path(lesson_id: @daily_lesson.id), class: "text-decoration-none" do %>
+                <div class="p-3 rounded-4 bg-light border-start border-4 border-primary shadow-sm hover-shadow transition-all">
+                  <div class="d-flex align-items-center">
+                    <i class="bi bi-lightbulb text-warning me-2 fs-5"></i>
+                    <div>
+                      <div class="fw-bold small text-dark">Thử thách hôm nay:</div>
+                      <div class="text-muted small">Ôn tập lại từ vựng đã học ở <%= @daily_lesson.name %>.</div>
+                    </div>
+                    <i class="bi bi-chevron-right ms-auto text-primary"></i>
+                  </div>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+          <div class="col-md-5 d-none d-md-block text-center">
+            <div class="position-relative">
+              <i class="bi bi-rocket-takeoff text-primary opacity-25" style="font-size: 8rem;"></i>
+              <div class="position-absolute top-50 start-50 translate-middle">
+                 <h2 class="display-4 fw-bold text-primary mb-0"><%= 25 - (@known/20).to_i %></h2>
+                 <div class="small fw-bold text-uppercase">Bài còn lại</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lối tắt nhanh -->
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card border-0 rounded-4 p-4 text-white h-100 shadow-sm transition-all" style="background: var(--primary-gradient);">
+        <div class="mb-3">
+          <i class="bi bi-alphabet-uppercase fs-1"></i>
+        </div>
+        <h3 class="fw-bold mb-2">Bảng chữ cái (Kana)</h3>
+        <p class="mb-4 opacity-75">Ôn tập Hiragana và Katakana để đọc tiếng Nhật trôi chảy hơn thông qua Flashcards.</p>
+        <div>
+          <%= link_to "Luyện tập ngay", kanas_path, class: "btn btn-light fw-bold px-4 py-2 rounded-3 text-primary shadow-sm" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card border-0 rounded-4 p-4 text-white h-100 shadow-sm transition-all" style="background: var(--info-gradient);">
+        <div class="mb-3">
+          <i class="bi bi-journal-text fs-1"></i>
+        </div>
+        <h3 class="fw-bold mb-2">Mina Nihongo N5</h3>
+        <p class="mb-4 opacity-75">Khám phá 25 bài học Minna no Nihongo với đầy đủ âm thanh và hình ảnh minh họa.</p>
+        <div>
+          <%= link_to "Vào bài học", vocabularies_path, class: "btn btn-light fw-bold px-4 py-2 rounded-3 text-info shadow-sm" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('turbo:load', function() {
+    const ctx = document.getElementById('learningChart');
+    if (!ctx) return;
+
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Đã thuộc', 'Đang học', 'Chưa học'],
+        datasets: [{
+          data: [<%= @known %>, <%= @unknown %>, <%= @not_learned %>],
+          backgroundColor: ['#198754', '#ffc107', '#adb5bd'],
+          borderWidth: 0,
+          hoverOffset: 10
+        }]
+      },
+      options: {
+        cutout: '70%',
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { usePointStyle: true, padding: 20 }
+          }
+        }
+      }
+    });
+  });
+</script>

@@ -1,0 +1,27 @@
+<div id="<%= dom_id vocabulary %>">
+  <div class="mb-4">
+    <label class="text-muted small text-uppercase fw-bold">Từ vựng</label>
+    <div class="display-5 text-dark"><%= vocabulary.word %></div>
+  </div>
+
+  <div class="mb-4">
+    <label class="text-muted small text-uppercase fw-bold">Ý nghĩa</label>
+    <div class="fs-4 text-primary"><%= vocabulary.meaning %></div>
+  </div>
+
+  <div class="mb-4">
+    <label class="text-muted small text-uppercase fw-bold">Bài học</label>
+    <div><span class="badge bg-secondary">Bài <%= vocabulary.lesson&.number %></span></div>
+  </div>
+
+  <% if vocabulary.images.attached? && vocabulary.images.any?(&:persisted?) %>
+    <div class="mb-4">
+      <label class="text-muted small text-uppercase fw-bold">Hình ảnh minh họa</label>
+      <div class="d-flex flex-wrap gap-3 mt-2">
+        <% vocabulary.images.select(&:persisted?).each do |image| %>
+          <%= image_tag image, class: "img-thumbnail", style: "width: 150px; height: 150px; object-fit: cover;" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

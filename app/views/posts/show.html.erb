@@ -1,10 +1,24 @@
-<p style="color: green"><%= notice %></p>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      <div class="mb-4">
+        <%= link_to posts_path, class: "text-decoration-none text-muted" do %>
+          <i class="bi bi-arrow-left"></i> Quay lại danh sách
+        <% end %>
+      </div>
 
-<%= render @post %>
+      <div class="card shadow-sm border-0 rounded-4 p-4 p-md-5 mb-4">
+        <%= render @post %>
+      </div>
 
-<div>
-  <%= link_to "Edit this post", edit_post_path(@post) %> |
-  <%= link_to "Back to posts", posts_path %>
-
-  <%= button_to "Destroy this post", @post, method: :delete %>
+      <div class="d-flex gap-2 justify-content-end">
+        <%= link_to "Chỉnh sửa", edit_post_path(@post), class: "btn btn-outline-secondary rounded-pill px-4" %>
+        <%= button_to "Xóa bài viết", @post, 
+            method: :delete, 
+            data: { turbo_confirm: "Bạn có chắc chắn muốn xóa?" }, 
+            class: "btn btn-outline-danger rounded-pill px-4" 
+        %>
+      </div>
+    </div>
+  </div>
 </div>

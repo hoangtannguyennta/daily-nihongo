@@ -1,0 +1,114 @@
+<!-- Flashcard Modal -->
+<div class="modal fade" id="flashcardModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      <div class="modal-body p-5 text-center">
+        <div id="flashcard-content" class="mb-4">
+          <h1 id="flashcard-front" class="display-1 fw-bold text-primary mb-3"></h1>
+          <div id="flashcard-back" class="d-none">
+            <h3 id="flashcard-meaning" class="fw-bold text-dark"></h3>
+            <p id="flashcard-reading" class="text-muted fs-5"></p>
+          </div>
+        </div>
+        <button type="button" id="btn-flip" class="btn btn-primary rounded-pill px-4 shadow-sm" onclick="flipFlashcard()">
+          <i class="bi bi-arrow-repeat"></i> Lật thẻ
+        </button>
+        <button type="button" class="btn btn-light rounded-pill px-4 ms-2" data-bs-dismiss="modal">Đóng</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Drawing/Writing Modal -->
+<div class="modal fade" id="drawingModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold ms-3 mt-2">Tập viết Kanji</h5>
+        <button type="button" class="btn-close me-2 mt-2" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4 text-center">
+        <div class="row align-items-center">
+          <div class="col-md-6 mb-3 mb-md-0">
+            <div class="bg-light rounded-4 p-4 d-flex align-items-center justify-content-center" style="height: 300px;">
+              <h1 id="drawing-target" class="display-1 fw-bold text-secondary-emphasis" style="font-size: 8rem; opacity: 0.2;"></h1>
+            </div>
+            <p class="text-muted small mt-2">Mẫu chữ</p>
+          </div>
+          <div class="col-md-6">
+            <div class="border rounded-4 shadow-inner overflow-hidden position-relative" style="height: 300px; background-color: #fff; background-image: linear-gradient(to right, #f0f0f0 1px, transparent 1px), linear-gradient(to bottom, #f0f0f0 1px, transparent 1px); background-size: 50% 50%;">
+              <canvas id="writing-canvas" width="300" height="300" style="cursor: crosshair;"></canvas>
+            </div>
+            <div class="mt-3 d-flex gap-2 justify-content-center">
+              <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="clearCanvas()">
+                <i class="bi bi-eraser"></i> Xóa bảng
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Flashcard Logic
+  function openFlashcardModal(word, meaning, reading) {
+    document.getElementById('flashcard-front').textContent = word;
+    document.getElementById('flashcard-meaning').textContent = meaning;
+    document.getElementById('flashcard-reading').textContent = reading;
+    document.getElementById('flashcard-back').classList.add('d-none');
+    document.getElementById('btn-flip').classList.remove('d-none');
+    
+    const modal = new bootstrap.Modal(document.getElementById('flashcardModal'));
+    modal.show();
+  }
+
+  function flipFlashcard() {
+    document.getElementById('flashcard-back').classList.remove('d-none');
+    document.getElementById('btn-flip').classList.add('d-none');
+  }
+
+  // Drawing Logic
+  let canvas, ctx, isDrawing = false;
+
+  function openDrawingModal(character) {
+    document.getElementById('drawing-target').textContent = character;
+    const modal = new bootstrap.Modal(document.getElementById('drawingModal'));
+    modal.show();
+    
+    // Khởi tạo canvas sau khi modal hiển thị để lấy đúng kích thước
+    setTimeout(() => {
+      canvas = document.getElementById('writing-canvas');
+      ctx = canvas.getContext('2d');
+      ctx.lineWidth = 6;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#0d6efd';
+      clearCanvas();
+
+      canvas.onmousedown = (e) => { isDrawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); };
+      canvas.onmousemove = (e) => { if (isDrawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } };
+      window.onmouseup = () => { isDrawing = false; };
+    }, 500);
+  }
+
+  function clearCanvas() {
+    if (ctx && canvas) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+</script>
+
+<style>
+  .shadow-inner {
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  }
+  #writing-canvas {
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
+  .modal-content {
+    overflow: hidden;
+  }
+</style>

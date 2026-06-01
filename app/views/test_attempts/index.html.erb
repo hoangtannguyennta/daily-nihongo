@@ -1,0 +1,81 @@
+<div class="container mt-4" data-controller="quiz">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      
+      <!-- Step 1: Chọn bài học -->
+      <div data-quiz-target="setupSection" class="card shadow-sm p-4">
+        <h2 class="text-center mb-4">Kiểm tra Từ vựng</h2>
+        <div class="mb-3">
+          <label class="form-label">Chọn bài học để bắt đầu:</label>
+          <select class="form-select form-select-lg" data-quiz-target="lessonSelect">
+            <% @lessons.each do |lesson| %>
+              <option value="<%= lesson.id %>" <%= 'selected' if params[:lesson_id].to_s == lesson.id.to_s %>>
+                Bài <%= lesson.number %>
+              </option>
+            <% end %>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-lg w-100" data-action="click->quiz#start">
+          Bắt đầu làm bài
+        </button>
+      </div>
+
+      <!-- Step 2: Khu vực làm bài (Ẩn lúc đầu) -->
+      <div data-quiz-target="quizSection" class="d-none">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <span class="fw-bold" data-quiz-target="progressText">Câu hỏi 1/10</span>
+            <div class="progress w-50" style="height: 10px;">
+              <div class="progress-bar" data-quiz-target="progressBar" role="progressbar" style="width: 0%"></div>
+            </div>
+          </div>
+          
+          <div class="card-body p-5 text-center">
+            <h1 class="display-3 mb-4" data-quiz-target="questionText">---</h1>
+            
+            <div class="row g-3">
+              <template data-quiz-target="optionTemplate">
+                <div class="col-6">
+                  <button class="btn btn-outline-secondary btn-lg w-100 py-3 option-btn" 
+                          data-action="click->quiz#selectOption">
+                  </button>
+                </div>
+              </template>
+              <div id="options-container" class="row g-3" data-quiz-target="optionsContainer">
+                <!-- Đáp án sẽ được render ở đây -->
+              </div>
+            </div>
+          </div>
+
+          <div class="card-footer bg-light text-end">
+            <button class="btn btn-success btn-lg d-none" 
+                    data-quiz-target="nextButton" 
+                    data-action="click->quiz#next">
+              Tiếp theo
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Kết quả -->
+      <div data-quiz-target="resultSection" class="d-none text-center">
+        <div class="card shadow p-5">
+          <h2 class="mb-3">Kết quả bài thi</h2>
+          <div class="display-1 text-primary mb-3">
+            <span data-quiz-target="finalScore">0</span>/<span data-quiz-target="finalTotal">0</span>
+          </div>
+          <p class="lead" data-quiz-target="resultMessage"></p>
+          <div class="mt-4">
+            <button class="btn btn-outline-primary" onclick="window.location.reload()">Làm lại bài khác</button>
+            <%= link_to "Về trang chủ", root_path, class: "btn btn-link" %>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+  .option-btn.active { background-color: #0d6efd; color: white; border-color: #0d6efd; }
+</style>

@@ -1,12 +1,11 @@
-<div id="<%= dom_id post %>">
-  <div>
-    <strong>Title:</strong>
-    <%= post.title %>
+<div id="<%= dom_id post %>" class="post-content">
+  <div class="mb-4">
+    <h1 class="display-5 fw-bold text-dark mb-3"><%= post.title %></h1>
+    <div class="text-muted small d-flex align-items-center gap-2">
+      <i class="bi bi-calendar3"></i> Đã đăng vào <%= post.created_at.strftime("%d/%m/%Y lúc %H:%M") %>
+    </div>
   </div>
-
-  <div>
-    <strong>Content:</strong>
+  <div class="fs-5 text-secondary lh-lg text-break" style="white-space: pre-wrap;">
     <%= post.content %>
   </div>
-
 </div>

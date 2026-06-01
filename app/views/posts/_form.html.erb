@@ -1,9 +1,8 @@
-<%= form_with(model: post) do |form| %>
+<%= form_with(model: post, class: "contents") do |form| %>
   <% if post.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(post.errors.count, "error") %> prohibited this post from being saved:</h2>
-
-      <ul>
+    <div id="error_explanation" class="alert alert-danger border-0 shadow-sm rounded-3 mb-4">
+      <h5 class="fw-bold"><%= pluralize(post.errors.count, "lỗi") %> khiến bài viết không thể lưu:</h5>
+      <ul class="mb-0">
         <% post.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -11,17 +10,21 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :title, style: "display: block" %>
-    <%= form.text_field :title %>
+  <div class="mb-4">
+    <%= form.label :title, "Tiêu đề bài viết", class: "form-label fw-semibold" %>
+    <%= form.text_field :title, class: "form-control form-control-lg shadow-sm border-light-subtle", placeholder: "Nhập tiêu đề hấp dẫn..." %>
   </div>
 
-  <div>
-    <%= form.label :content, style: "display: block" %>
-    <%= form.textarea :content %>
+  <div class="mb-4">
+    <%= form.label :content, "Nội dung", class: "form-label fw-semibold" %>
+    <%= form.text_area :content, rows: 10, class: "form-control shadow-sm border-light-subtle", placeholder: "Bạn đang nghĩ gì?..." %>
   </div>
 
-  <div>
-    <%= form.submit %>
+  <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-5">
+    <%= link_to posts_path, class: "btn btn-light rounded-pill px-4" do %>
+      <i class="bi bi-arrow-left"></i> Quay lại
+    <% end %>
+    
+    <%= form.submit "Lưu bài viết", class: "btn btn-primary btn-lg rounded-pill px-5 shadow" %>
   </div>
 <% end %>

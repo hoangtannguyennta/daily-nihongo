@@ -1,0 +1,26 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <% if notice %>
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+          <%= notice %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% end %>
+
+      <div class="card shadow border-0 p-5 mb-4">
+        <%= render @vocabulary %>
+
+        <hr class="my-4">
+        
+        <div class="d-flex justify-content-between">
+          <div>
+            <%= link_to "Sửa từ này", edit_vocabulary_path(@vocabulary), class: "btn btn-primary" %>
+            <%= link_to "Quay lại danh sách", vocabularies_path, class: "btn btn-outline-secondary ms-2" %>
+          </div>
+          <%= button_to "Xóa từ vựng", @vocabulary, method: :delete, data: { confirm: "Bạn có chắc?" }, class: "btn btn-outline-danger" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

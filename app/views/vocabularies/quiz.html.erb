@@ -1,0 +1,185 @@
+<div class="container py-5 text-center">
+  <h1 class="display-5 fw-bold text-primary mb-5">Vocabulary Quiz</h1>
+  <% if @lesson %>
+    <p class="lead text-muted mb-4"><%= @lesson.name %></p>
+  <% end %>
+
+  <div id="quiz-container" class="card vocab-card shadow border-0 p-4 mx-auto" style="max-width: 600px;">
+    <h2 id="question" class="display-3 mb-5 text-dark fw-bold">Đang tải...</h2>
+    <div id="options-container" class="row row-cols-1 row-cols-md-2 g-3">
+      <!-- Options will be rendered here by JavaScript -->
+    </div>
+    <p id="feedback" class="mt-4 fw-bold fs-5"></p>
+    <div class="mt-3 d-flex justify-content-center">
+      <button id="next-question-btn" class="btn btn-success btn-lg px-5 rounded-pill" style="display: none;">Câu hỏi tiếp theo</button>
+    </div>
+    <audio id="quiz-audio" style="display: none;"></audio>
+    <%= link_to "Quay lại", clear_quiz_session_vocabularies_path, data: { turbo_method: :delete }, class: "btn btn-link text-secondary mt-3" %>
+  </div>
+</div>
+
+<script type="module">
+  // Kiểm tra để không chạy script khi Turbo đang hiển thị bản xem trước (preview cache)
+  if (!document.documentElement.hasAttribute('data-turbo-preview')) {
+    const questionElement = document.getElementById('question');
+    const optionsContainer = document.getElementById('options-container');
+    const feedbackElement = document.getElementById('feedback');
+    const nextQuestionBtn = document.getElementById('next-question-btn');
+    const audioPlayer = document.getElementById('quiz-audio');
+
+    let currentCorrectAnswer = '';
+
+    async function fetchQuizQuestion() {
+      feedbackElement.textContent = '';
+      optionsContainer.innerHTML = '';
+      nextQuestionBtn.style.display = 'none';
+      questionElement.textContent = 'Đang tải câu hỏi...';
+      questionElement.classList.add('text-muted'); // Add muted class while loading
+
+      // Chuyển tiếp tất cả tham số lọc (lesson_id, filter, query) từ URL hiện tại sang API quiz
+      const apiUrl = `/vocabularies/quiz.json${window.location.search}`;
+
+      try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+          throw new Error(`Lỗi HTTP! status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        if (data.question === "Hết từ vựng") { // Handle no more questions
+          questionElement.textContent = "Không còn câu hỏi nào trong bài này.";
+          questionElement.classList.add('text-warning');
+          return;
+        }
+
+        questionElement.textContent = data.question;
+        questionElement.classList.remove('text-muted'); // Remove muted class after loading
+        currentCorrectAnswer = data.correct;
+
+        // Tự động phát âm thanh nếu có
+        if (data.audio_url) {
+          audioPlayer.src = data.audio_url;
+          audioPlayer.play().catch(e => console.log("Yêu cầu tương tác để phát nhạc"));
+        }
+
+        data.options.forEach(option => {
+          const col = document.createElement('div');
+          col.classList.add('col');
+          
+          const button = document.createElement('button');
+          button.textContent = option;
+          button.classList.add('btn', 'btn-outline-primary', 'btn-lg', 'quiz-option-btn', 'rounded-4', 'py-3', 'w-100', 'h-100', 'd-flex', 'align-items-center', 'justify-content-center');
+          button.addEventListener('click', () => handleAnswer(option, button));
+          
+          col.appendChild(button);
+          optionsContainer.appendChild(col);
+        });
+      } catch (error) {
+        console.error('Lỗi khi tải câu hỏi quiz:', error);
+        questionElement.textContent = 'Không thể tải quiz. Vui lòng thử lại.';
+      }
+    }
+
+    function handleAnswer(selectedOption, button) {
+      const allButtons = optionsContainer.querySelectorAll('.quiz-option-btn');
+      
+      allButtons.forEach(btn => {
+        btn.disabled = true;
+        btn.classList.add('disabled-after-selection'); // Add a class to style disabled buttons
+      });
+
+      if (selectedOption === currentCorrectAnswer) {
+        feedbackElement.textContent = 'Chính xác!';
+        feedbackElement.classList.remove('text-danger'); // Remove previous state if any
+        feedbackElement.classList.add('text-success');
+        button.classList.replace('btn-outline-primary', 'btn-success');
+        button.classList.remove('disabled-after-selection'); // Remove if it's the correct one
+      } else {
+        feedbackElement.textContent = `Sai rồi. Đáp án đúng là: ${currentCorrectAnswer}`;
+        feedbackElement.classList.remove('text-success'); // Remove previous state if any
+        feedbackElement.classList.add('text-danger');
+        button.classList.replace('btn-outline-primary', 'btn-danger');
+        button.classList.remove('disabled-after-selection'); // Remove if it's the incorrect one selected
+        document.getElementById('quiz-container').classList.add('shake-animation'); // Hiệu ứng rung
+        
+        // Đánh dấu đáp án đúng
+        allButtons.forEach(btn => {
+          if (btn.textContent === currentCorrectAnswer) {
+            btn.classList.replace('btn-outline-primary', 'btn-success');
+            btn.classList.remove('disabled-after-selection'); // Remove if it's the correct one
+          }
+        });
+      }
+      nextQuestionBtn.style.display = 'block';
+    }
+
+    nextQuestionBtn.addEventListener('click', () => {
+      feedbackElement.classList.remove('text-success', 'text-danger'); // Clear feedback colors
+      document.getElementById('quiz-container').classList.remove('shake-animation');
+      fetchQuizQuestion();
+    });
+
+    fetchQuizQuestion();
+  }
+</script>
+
+<style>
+  /* Custom styles for quiz options */
+  .quiz-option-btn {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-width: 2px;
+    font-weight: 600;
+    min-height: 80px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  .quiz-option-btn:hover:not(:disabled) {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 15px rgba(13, 110, 253, 0.15);
+    background-color: #f8fbff;
+    border-color: #0d6efd;
+  }
+
+  .quiz-option-btn:active:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  /* Style for disabled buttons after selection */
+  .quiz-option-btn.disabled-after-selection {
+    opacity: 0.6; /* Slightly fade out unselected options */
+    cursor: not-allowed;
+  }
+
+  /* Ensure success/danger buttons are fully visible */
+  .quiz-option-btn.btn-success,
+  .quiz-option-btn.btn-danger {
+    opacity: 1;
+    color: white !important;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  /* Override Bootstrap's default disabled button styling for quiz options */
+  .quiz-option-btn:disabled {
+    pointer-events: none; /* Prevent click events */
+    opacity: 1; /* Keep full opacity for selected correct/incorrect */
+  }
+
+  #question {
+    letter-spacing: -1px;
+  }
+
+  /* Hiệu ứng rung khi trả lời sai */
+  .shake-animation {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    transform: translate3d(0, 0, 0);
+  }
+
+  @keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+  }
+</style>

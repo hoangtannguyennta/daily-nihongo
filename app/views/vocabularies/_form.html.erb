@@ -1,0 +1,191 @@
+<%= form_with(model: vocabulary, html: { multipart: true }) do |form| %>
+  <% if vocabulary.errors.any? %>
+    <div class="alert alert-danger">
+      <h4 class="alert-heading text-danger"><%= pluralize(vocabulary.errors.count, "lỗi") %> khiến không thể lưu:</h4>
+      <ul class="mb-0">
+        <% vocabulary.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :word, "Từ vựng (Kanji/Kana)", class: "form-label fw-bold" %>
+    <%= form.text_field :word, class: "form-control #{'is-invalid' if vocabulary.errors[:word].any?}", placeholder: "Ví dụ: 先生" %>
+    <% if vocabulary.errors[:word].any? %>
+      <div class="invalid-feedback">
+        <%= vocabulary.errors[:word].join(", ") %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :meaning, "Ý nghĩa (Tiếng Việt)", class: "form-label fw-bold" %>
+    <%= form.text_field :meaning, class: "form-control #{'is-invalid' if vocabulary.errors[:meaning].any?}", placeholder: "Ví dụ: Giáo viên" %>
+    <% if vocabulary.errors[:meaning].any? %>
+      <div class="invalid-feedback">
+        <%= vocabulary.errors[:meaning].join(", ") %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :audio, "File âm thanh (Phát âm)", class: "form-label fw-bold" %>
+    <%= form.file_field :audio, class: "form-control", accept: "audio/*" %>
+    
+    <% if vocabulary.audio.attached? %>
+      <div class="mt-2 p-3 border rounded bg-light">
+        <p class="small text-muted mb-2">Âm thanh hiện tại:</p>
+        <div class="d-flex align-items-center gap-3">
+          <audio controls src="<%= url_for(vocabulary.audio) %>" style="height: 40px;"></audio>
+          <div class="form-check ms-auto">
+            <%= check_box_tag "vocabulary[purge_audio]", "1", false, class: "form-check-input" %>
+            <%= label_tag "vocabulary_purge_audio", "Xóa âm thanh hiện tại", class: "form-check-label small text-danger" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label fw-bold d-block">Mức độ ưu tiên (Radio buttons)</label>
+    <div class="btn-group w-100" role="group">
+      <%= form.radio_button :priority, :low, class: "btn-check" %>
+      <%= form.label :priority, "Thấp", value: :low, class: "btn btn-outline-secondary" %>
+
+      <%= form.radio_button :priority, :normal, class: "btn-check" %>
+      <%= form.label :priority, "Thường", value: :normal, class: "btn btn-outline-primary" %>
+
+      <%= form.radio_button :priority, :high, class: "btn-check" %>
+      <%= form.label :priority, "Quan trọng", value: :high, class: "btn btn-outline-danger" %>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :images, "Hình ảnh minh họa (có thể chọn nhiều)", class: "form-label fw-bold" %>
+    <div class="custom-file-upload">
+      <label for="vocabulary_images_input" class="btn btn-outline-primary d-flex flex-column align-items-center justify-content-center py-4 w-100 border-2 shadow-sm" style="border-style: dashed; border-radius: 12px; transition: all 0.3s ease;">
+        <i class="bi bi-cloud-arrow-up-fill fs-1 mb-2"></i>
+        <span class="fw-bold">Bấm để chọn ảnh từ máy tính</span>
+        <small class="text-muted">(Định dạng: PNG, JPG, GIF, WebP)</small>
+      </label>
+      <%= form.file_field :images, multiple: true, class: "d-none", id: "vocabulary_images_input", accept: 'image/png,image/jpeg,image/gif,image/webp' %>
+    </div>
+
+    <div id="new-image-previews" class="mt-3 d-flex flex-wrap gap-2"></div>
+
+    <% if vocabulary.images.attached? && vocabulary.images.any? %>
+      <div class="mt-3 border-top pt-3">
+        <p class="small text-muted mb-2">Ảnh hiện tại trong hệ thống:</p>
+        <div class="d-flex flex-wrap gap-2" id="existing-image-previews">
+          <% vocabulary.images.select(&:persisted?).each do |image| %>
+            <div class="position-relative existing-image-item">
+              <%= image_tag image, class: "img-thumbnail", style: "width: 120px; height: 120px; object-fit: cover;" %>
+              <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 rounded-circle remove-existing-image" data-attachment-signed-id="<%= image.signed_id %>" style="width: 24px; height: 24px; padding: 0; line-height: 1; z-index: 10;">&times;</button>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mb-4">
+    <%= form.label :lesson_id, "Thuộc bài học", class: "form-label fw-bold" %>
+    <%= form.collection_select :lesson_id, @lessons, :id, :number, { prompt: "Chọn một bài học" }, { class: "form-select #{'is-invalid' if vocabulary.errors[:lesson_id].any?}" } %>
+    <% if vocabulary.errors[:lesson_id].any? %>
+      <div class="invalid-feedback">
+        <%= vocabulary.errors[:lesson_id].join(", ") %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="d-grid gap-2 d-md-flex mt-4 pt-3 border-top">
+    <%= form.button type: :submit, class: "btn btn-primary px-5 py-2 shadow-sm d-flex align-items-center justify-content-center gap-2" do %>
+      <i class="bi bi-check-circle-fill"></i>
+      <span>Lưu từ vựng</span>
+    <% end %>
+    
+    <%= link_to vocabularies_path, class: "btn btn-outline-secondary px-4 py-2 d-flex align-items-center justify-content-center gap-2" do %>
+      <i class="bi bi-arrow-left-circle"></i>
+      <span>Hủy bỏ</span>
+    <% end %>
+  </div>
+<% end %>
+
+<script>
+  $(document).on('turbo:load', function() {
+    const $input = $('#vocabulary_images_input');
+    const $container = $('#new-image-previews');
+    
+    if (!$input.length) return;
+
+    // DataTransfer để giữ danh sách file cộng dồn
+    let dt = new DataTransfer();
+
+    // --- Xử lý xóa ảnh ĐÃ CÓ trong hệ thống ---
+    $('.remove-existing-image').on('click', function() {
+      const $btn = $(this);
+      const signedId = $btn.data('attachment-signed-id');
+      const $container = $btn.closest('form');
+      const $item = $btn.closest('.existing-image-item');
+
+      // Thêm input ẩn để gửi signed_id về controller xử lý purge
+      $container.append(`<input type="hidden" name="vocabulary[attachments_to_purge][]" value="${signedId}">`);
+
+      // Xóa hiển thị trên giao diện
+      $item.remove();
+    });
+
+    // Lắng nghe sự kiện chọn file
+    $input.off('change').on('change', function(e) {
+      const newFiles = e.target.files;
+      if (!newFiles) return;
+
+      // Thêm các file mới vào danh sách hiện tại
+      $.each(newFiles, function(i, file) {
+        if (file.type.startsWith('image/')) {
+          dt.items.add(file);
+        }
+      });
+
+      // Cập nhật lại input.files để gửi lên server khi submit
+      this.files = dt.files;
+      renderPreviews();
+    });
+
+    function renderPreviews() {
+      $container.empty();
+
+      // Duyệt qua danh sách file trong dt
+      $.each(dt.files, function(index, file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(event) {
+          const $div = $('<div class="position-relative"></div>');
+          const $img = $('<img>').attr('src', event.target.result).addClass('img-thumbnail').css({
+            width: '120px', height: '120px', objectFit: 'cover', border: '2px solid #0d6efd'
+          });
+          
+          const $btn = $('<button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 rounded-circle">&times;</button>')
+            .css({ width: '24px', height: '24px', padding: '0', lineHeight: '1' })
+            .on('click', function() {
+              // Xóa file khỏi DataTransfer
+              const newDt = new DataTransfer();
+              $.each(dt.files, function(j, f) {
+                if (index !== j) newDt.items.add(f);
+              });
+              dt = newDt;
+              $input[0].files = dt.files; // Cập nhật lại input
+              renderPreviews(); // Vẽ lại preview
+            });
+
+          $div.append($img).append($btn);
+          $container.append($div);
+        };
+
+        reader.readAsDataURL(file);
+      });
+    }
+  });
+</script>

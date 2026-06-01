@@ -1,0 +1,8 @@
+vi:
+  views:
+    pagination:
+      first: "&laquo; Trang đầu"
+      last: "Trang cuối &raquo;"
+      previous: "&lsaquo; Trước"
+      next: "Tiếp &rsaquo;"
+      truncate: "&hellip;"

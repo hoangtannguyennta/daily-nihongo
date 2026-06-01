@@ -1,0 +1,474 @@
+<div class="container py-5">
+  <% if notice %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <%= notice %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% end %>
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="header-title">
+      <h1 class="display-6 fw-bold text-dark mb-1">Kho Từ Vựng</h1>
+      <p class="text-muted mb-0">Học tập và quản lý vốn từ vựng tiếng Nhật hiệu quả</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap justify-content-end">
+      <div class="dropdown">
+        <button class="btn btn-soft-secondary rounded-pill px-3 dropdown-toggle shadow-sm" type="button" data-bs-toggle="dropdown">
+          <i class="bi bi-journal-text"></i> Học tập
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+          <li><%= link_to user_vocabularies_path, class: "dropdown-item" do %><i class="bi bi-journal-bookmark me-2"></i>Sổ tay của tôi<% end %></li>
+          <li><%= link_to progress_user_vocabularies_path, class: "dropdown-item" do %><i class="bi bi-graph-up-arrow me-2"></i>Tiến độ học tập<% end %></li>
+          <li><%= link_to total_score_user_vocabularies_path, class: "dropdown-item" do %><i class="bi bi-award me-2"></i>Tổng điểm bài tập<% end %></li>
+        </ul>
+      </div>
+      <%= link_to test_attempts_path(lesson_id: params[:lesson_id]), class: "btn btn-soft-primary rounded-pill px-3 shadow-sm" do %>
+        <i class="bi bi-card-checklist"></i> Kiểm tra
+      <% end %>
+      <%= link_to quiz_vocabularies_path(lesson_id: params[:lesson_id], query: params[:query]), class: "btn btn-soft-success rounded-pill px-3 shadow-sm" do %>
+        <i class="bi bi-controller"></i> Luyện tập nhanh
+      <% end %>
+      <%= link_to new_vocabulary_path, class: "btn btn-primary rounded-pill shadow-sm px-3" do %>
+        <i class="bi bi-plus-lg"></i> Thêm từ mới
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 mb-4 rounded-4 vocab-card">
+    <div class="card-body p-3">
+      <%= form_with url: vocabularies_path, method: :get, class: "row g-3 align-items-end" do |f| %>
+        <div class="col-md-5">
+          <div class="d-flex align-items-center search-wrapper">
+            <i class="bi bi-search text-muted me-2"></i>
+            <%= f.text_field :query, value: params[:query], 
+                class: "form-control border-0 bg-transparent shadow-none", 
+                placeholder: "Tìm từ vựng, ý nghĩa..." %>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <%= f.collection_select :lesson_id, @lessons, :id, :name,
+              { include_blank: "Tất cả bài học", selected: params[:lesson_id] }, 
+              { class: "form-select filter-select-custom shadow-none", onchange: "this.form.requestSubmit()" } %>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+          <button type="submit" class="btn btn-dark w-100 fw-bold rounded-pill shadow-sm px-4">Tìm kiếm</button>
+          <%= link_to "Xóa lọc", vocabularies_path, class: "btn btn-outline-secondary w-100 rounded-pill px-4" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 vocab-card">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 vocab-table">
+        <thead>
+          <tr>
+            <th class="ps-4 text-uppercase small fw-bold text-muted">Từ vựng</th>
+            <th class="text-center text-uppercase small fw-bold text-muted">Công cụ hỗ trợ</th>
+            <th class="text-center text-uppercase small fw-bold text-muted">Trạng thái</th>
+            <th class="text-uppercase small fw-bold text-muted">Ý nghĩa</th>
+            <th class="text-center">Bài học</th>
+            <th class="text-center text-uppercase small fw-bold text-muted">Minh họa</th>
+            <th class="text-end pe-4 text-uppercase small fw-bold text-muted">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if @vocabularies.any? %>
+            <% @vocabularies.each do |vocabulary| %>
+            <tr class="vocab-row">
+              <td class="ps-4">
+                <div class="d-flex flex-column">
+                  <span class="fw-bold fs-5 text-primary word-kanji"><%= vocabulary.word %></span>
+                  <span class="small text-muted font-monospace"><%= vocabulary.romaji %></span>
+                </div>
+              </td>
+              <td class="text-center">
+                <div class="btn-group btn-group-sm bg-light rounded-pill p-1">
+                  <% if vocabulary.audio.attached? %>
+                    <button onclick="new Audio('<%= url_for(vocabulary.audio) %>').play()" 
+                            class="btn btn-link text-primary p-1 mx-1" title="Nghe">
+                      <i class="bi bi-volume-up-fill fs-5"></i>
+                    </button>
+                  <% end %>
+                  <button class="btn btn-link text-secondary p-1 mx-1" 
+                          onclick="openDrawingModal('<%= vocabulary.word %>')" title="Tập viết">
+                    <i class="bi bi-pencil-square fs-5"></i>
+                  </button>
+                  <button class="btn btn-link text-info p-1 mx-1" 
+                          onclick="openFlashcardModal('<%= vocabulary.word %>', '<%= vocabulary.meaning %>', '<%= vocabulary.romaji %>')" title="Thẻ ghi nhớ">
+                    <i class="bi bi-card-text fs-5"></i>
+                  </button>
+                </div>
+              </td>
+              <td class="text-center">
+                <% if current_user %>
+                  <% status = @user_statuses[vocabulary.id] %>
+                  <div class="status-pill-group vocab-status-group" data-vocab-id="<%= vocabulary.id %>">
+                    <button onclick="updateVocabStatus(<%= vocabulary.id %>, 'not_learned')" 
+                            class="status-btn not-learned <%= 'active' if (status == 'not_learned' || status.nil?) %>" title="Chưa học">
+                      <i class="bi bi-dash-circle"></i>
+                    </button>
+                    <button onclick="updateVocabStatus(<%= vocabulary.id %>, 'not_remembered')" 
+                            class="status-btn not-remembered <%= 'active' if status == 'not_remembered' %>" title="Chưa thuộc">
+                      <i class="bi bi-question-circle"></i>
+                    </button>
+                    <button onclick="updateVocabStatus(<%= vocabulary.id %>, 'remembered')" 
+                            class="status-btn remembered <%= 'active' if status == 'remembered' %>" title="Đã thuộc">
+                      <i class="bi bi-check-circle"></i>
+                    </button>
+                  </div>
+                <% end %>
+              </td>
+              <td><span class="fw-medium text-dark"><%= vocabulary.meaning %></span></td>
+              <td class="text-center"><span class="badge bg-soft-primary text-primary rounded-pill px-3">Bài <%= vocabulary.lesson&.number %></span></td>
+              <td class="text-center">
+                <div class="d-flex justify-content-center gap-1">
+                  <% vocabulary.images.each do |image| %>
+                    <%= image_tag image, class: "rounded-3 img-preview shadow-sm", style: "width: 42px; height: 42px; object-fit: cover;" %>
+                  <% end %>
+                </div>
+              </td>
+              <td class="text-end pe-4 action-cell">
+                <div class="dropdown">
+                  <button class="btn btn-light btn-sm rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-three-dots-vertical"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                    <li>
+                      <%= link_to edit_vocabulary_path(vocabulary), class: "dropdown-item text-primary" do %>
+                        <i class="bi bi-pencil-square me-2"></i> Chỉnh sửa
+                      <% end %>
+                    </li>
+                    <li>
+                      <%= button_to vocabulary, method: :delete, 
+                          form: { data: { turbo_confirm: "Xóa '#{vocabulary.word}'?" } },
+                          class: "dropdown-item text-danger border-0 bg-transparent w-100 text-start" do %>
+                        <i class="bi bi-trash3 me-2"></i> Xóa
+                      <% end %>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <% if @vocabularies.any? %>
+      <div class="card-footer bg-white border-top-0 py-3">
+        <div class="d-flex justify-content-center">
+          <%= paginate @vocabularies %>
+        </div>
+      </div>
+    <% end %>
+
+    <% unless @vocabularies.any? %>
+      <div class="text-center py-5">
+        <i class="bi bi-book text-muted display-1"></i>
+        <p class="mt-3 text-muted">Chưa có từ vựng nào được tạo.</p>
+        <%= link_to "Tạo từ đầu tiên", new_vocabulary_path, class: "btn btn-sm btn-outline-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Modal Luyện Viết -->
+<div class="modal fade" id="drawingModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+      <div class="modal-header border-0 pt-4 px-4 pb-0">
+        <h5 class="modal-title fw-bold">Tập viết: <span id="modalWordTitle" class="text-primary"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="canvas-container position-relative d-inline-block shadow-sm mb-3" 
+             style="background: #fdfdfd; border: 2px dashed #dee2e6; border-radius: 15px;">
+          <canvas id="writingCanvas" width="400" height="300" style="cursor: crosshair; touch-action: none;"></canvas>
+        </div>
+        <div class="d-flex justify-content-center gap-2">
+          <button class="btn btn-light border fw-bold px-4 rounded-pill" onclick="clearCanvas()">
+            <i class="bi bi-eraser-fill me-1"></i> Xóa bảng
+          </button>
+          <button class="btn btn-primary fw-bold px-4 rounded-pill" data-bs-dismiss="modal">
+            Xong
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Flash Card -->
+<div class="modal fade" id="flashcardModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 bg-transparent">
+      <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
+        <div class="flashcard-inner shadow-lg">
+          <!-- Mặt trước: Từ vựng -->
+          <div class="flashcard-front d-flex flex-column align-items-center justify-content-center bg-white">
+            <span class="small text-muted mb-3">Nhấn để xem nghĩa</span>
+            <h1 class="display-1 fw-bold text-dark mb-0" id="fc-word"></h1>
+          </div>
+          <!-- Mặt sau: Ý nghĩa & Romaji -->
+          <div class="flashcard-back d-flex flex-column align-items-center justify-content-center bg-primary text-white text-center p-4">
+            <h2 class="display-6 fw-bold mb-2" id="fc-meaning"></h2>
+            <p class="fs-4 opacity-75 mb-0" id="fc-romaji"></p>
+            <span class="small mt-4 opacity-50">Nhấn để quay lại</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.writingCanvas = null;
+  window.writingCtx = null;
+  window.isDrawing = false;
+  window.currentDrawingWord = "";
+
+  window.openDrawingModal = function(word) {
+    window.currentDrawingWord = word;
+    document.getElementById('modalWordTitle').textContent = word;
+    
+    const modalEl = document.getElementById('drawingModal');
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+    
+    setTimeout(() => {
+      window.initCanvas();
+      window.drawGuideText();
+    }, 500);
+  }
+
+  window.initCanvas = function() {
+    window.writingCanvas = document.getElementById('writingCanvas');
+    window.writingCtx = window.writingCanvas.getContext('2d');
+    
+    window.writingCtx.lineWidth = 4;
+    window.writingCtx.lineCap = 'round';
+    window.writingCtx.strokeStyle = '#2c3e50';
+
+    window.writingCanvas.onmousedown = window.startDrawing;
+    window.writingCanvas.onmousemove = window.draw;
+    window.writingCanvas.onmouseup = window.stopDrawing;
+    window.writingCanvas.onmouseout = window.stopDrawing;
+
+    window.writingCanvas.ontouchstart = (e) => { e.preventDefault(); window.startDrawing(e.touches[0]); };
+    window.writingCanvas.ontouchmove = (e) => { e.preventDefault(); window.draw(e.touches[0]); };
+    window.writingCanvas.ontouchend = window.stopDrawing;
+  }
+
+  window.drawGuideText = function() {
+    window.writingCtx.clearRect(0, 0, window.writingCanvas.width, window.writingCanvas.height);
+    const fontSize = Math.min(150, (window.writingCanvas.width * 0.85) / window.currentDrawingWord.length);
+    window.writingCtx.font = `${fontSize}px 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif`;
+    window.writingCtx.fillStyle = "#f0f0f0";
+    window.writingCtx.textAlign = "center";
+    window.writingCtx.textBaseline = "middle";
+    window.writingCtx.fillText(window.currentDrawingWord, window.writingCanvas.width / 2, window.writingCanvas.height / 2);
+  }
+
+  window.startDrawing = function(e) {
+    window.isDrawing = true;
+    window.writingCtx.beginPath();
+    const rect = window.writingCanvas.getBoundingClientRect();
+    window.writingCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+  }
+
+  window.draw = function(e) {
+    if (!window.isDrawing) return;
+    const rect = window.writingCanvas.getBoundingClientRect();
+    window.writingCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    window.writingCtx.stroke();
+  }
+
+  window.stopDrawing = function() {
+    window.isDrawing = false;
+  }
+
+  window.clearCanvas = function() {
+    window.drawGuideText();
+  }
+
+  window.openFlashcardModal = function(word, meaning, romaji) {
+    document.getElementById('fc-word').textContent = word;
+    document.getElementById('fc-meaning').textContent = meaning;
+    document.getElementById('fc-romaji').textContent = romaji;
+    
+    const container = document.querySelector('.flashcard-container');
+    if (container) container.classList.remove('flipped');
+
+    const modalEl = document.getElementById('flashcardModal');
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+  }
+
+  window.updateVocabStatus = function(vocabId, status) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    
+    fetch('/user_vocabularies/update_status', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken
+      },
+      body: JSON.stringify({ vocabulary_id: vocabId, status: status })
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Cập nhật UI của các nút bấm dựa trên kết quả trả về
+      const group = document.querySelector(`.vocab-status-group[data-vocab-id="${vocabId}"]`);
+      if (group) {
+        const buttons = group.querySelectorAll('.status-btn');
+        const s = data.status;
+
+        buttons.forEach(btn => btn.classList.remove('active'));
+        if (s === 'not_learned' || !s) buttons[0].classList.add('active');
+        else if (s === 'not_remembered') buttons[1].classList.add('active');
+        else if (s === 'remembered') buttons[2].classList.add('active');
+      }
+    })
+    .catch(error => {
+      console.error('Lỗi khi cập nhật trạng thái:', error);
+    });
+  }
+</script>
+
+<style>
+  .canvas-container:after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 0; right: 0; border-top: 1px dotted #e0e0e0;
+    pointer-events: none;
+  }
+  .canvas-container:before {
+    content: "";
+    position: absolute;
+    left: 50%; top: 0; bottom: 0; border-left: 1px dotted #e0e0e0;
+    pointer-events: none;
+  }
+
+  /* Flashcard Styles */
+  .flashcard-container {
+    perspective: 1000px;
+    width: 100%;
+    max-width: 400px;
+    height: 300px;
+    margin: 0 auto;
+    cursor: pointer;
+  }
+
+  .flashcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+    border-radius: 20px;
+  }
+
+  .flashcard-container.flipped .flashcard-inner {
+    transform: rotateY(180deg);
+  }
+
+  .flashcard-front, .flashcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 20px;
+    display: flex;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+
+  .flashcard-back {
+    transform: rotateY(180deg);
+  }
+
+  /* Cải tiến UI tổng thể */
+  .vocab-row {
+    transition: background-color 0.2s;
+  }
+  .vocab-row:hover {
+    background-color: #fcfdfe !important;
+  }
+  
+  /* Cải tiến các loại nút Soft Style */
+  .btn-soft-primary {
+    background-color: #e0e7ff;
+    color: #4338ca;
+    border: none;
+  }
+  .btn-soft-primary:hover {
+    background-color: #4338ca;
+    color: white;
+  }
+  .btn-soft-success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: none;
+  }
+  .btn-soft-success:hover {
+    background-color: #10b981;
+    color: white;
+  }
+  .btn-soft-secondary {
+    background-color: #f3f4f6;
+    color: #374151;
+    border: none;
+  }
+  .btn-soft-secondary:hover {
+    background-color: #374151;
+    color: white;
+  }
+  .bg-soft-primary {
+    background-color: #e0e7ff;
+  }
+  .img-preview {
+    transition: transform 0.2s;
+    cursor: zoom-in;
+  }
+  .img-preview:hover {
+    transform: scale(1.5);
+  }
+
+  /* Status Selector Styles */
+  .status-pill-group {
+    display: inline-flex;
+    background-color: #f8f9fa;
+    padding: 0.25rem;
+    border-radius: 50rem;
+    border: 1px solid #dee2e6;
+  }
+
+  .status-btn {
+    border: none;
+    background: transparent;
+    color: #adb5bd;
+    padding: 0.25rem 0.6rem;
+    border-radius: 50rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .status-btn:hover {
+    color: #6c757d;
+    background-color: rgba(0, 0, 0, 0.03);
+  }
+
+  .status-btn.active {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  .status-btn.active.not-learned { color: #6c757d; }
+  .status-btn.active.not-remembered { color: #f59e0b; }
+  .status-btn.active.remembered { color: #10b981; }
+</style>

@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  test_attempt: one
+  vocabulary: one
+  selected_answer: MyString
+  correct_answer: MyString
+  correct: false
+
+two:
+  test_attempt: two
+  vocabulary: two
+  selected_answer: MyString
+  correct_answer: MyString
+  correct: false

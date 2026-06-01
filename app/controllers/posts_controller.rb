@@ -42,7 +42,7 @@ class PostsController < ApplicationController
         format.json { render :show, status: :ok, location: @post }
       else
         format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @post.errors, status: :unprocessable_entity }
+        format.json { render json: @post. errors, status: :unprocessable_entity }
       end
     end
   end
@@ -65,6 +65,6 @@ class PostsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def post_params
-      params.expect(post: [ :title, :content ])
+      params.expect(post: [ :title, :content, :image ])
     end
 end

@@ -1,0 +1,13 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow border-0 p-4">
+        <h1 class="h3 mb-4 fw-bold text-primary text-center">Thêm từ vựng mới</h1>
+        <%= render "form", vocabulary: @vocabulary %>
+      </div>
+      <div class="mt-3 text-center">
+        <%= link_to "← Quay lại danh sách", vocabularies_path, class: "text-secondary text-decoration-none" %>
+      </div>
+    </div>
+  </div>
+</div>

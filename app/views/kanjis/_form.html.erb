@@ -1,0 +1,41 @@
+<%= form_with(model: kanji, class: "row g-3") do |f| %>
+  <% if kanji.errors.any? %>
+    <div class="alert alert-danger">
+      <ul>
+        <% kanji.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="col-md-4">
+    <%= f.label :character, "Hán tự", class: "form-label fw-bold" %>
+    <%= f.text_field :character, class: "form-control form-control-lg text-center fs-2", placeholder: "字" %>
+  </div>
+  <div class="col-md-8">
+    <%= f.label :meaning, "Ý nghĩa (Tiếng Việt)", class: "form-label fw-bold" %>
+    <%= f.text_field :meaning, class: "form-control form-control-lg", placeholder: "Chữ (tự)" %>
+  </div>
+  <div class="col-md-6">
+    <%= f.label :onyomi, "Âm Onyomi (Katakana)", class: "form-label fw-bold" %>
+    <%= f.text_field :onyomi, class: "form-control", placeholder: "ジ" %>
+  </div>
+  <div class="col-md-6">
+    <%= f.label :kunyomi, "Âm Kunyomi (Hiragana)", class: "form-label fw-bold" %>
+    <%= f.text_field :kunyomi, class: "form-control", placeholder: "あざ" %>
+  </div>
+  <div class="col-md-6">
+    <%= f.label :jlpt_level, "Cấp độ JLPT", class: "form-label fw-bold" %>
+    <%= f.select :jlpt_level, ["N5", "N4", "N3", "N2", "N1"], {}, class: "form-select" %>
+  </div>
+  <div class="col-md-6">
+    <%= f.label :stroke_count, "Số nét", class: "form-label fw-bold" %>
+    <%= f.number_field :stroke_count, class: "form-control" %>
+  </div>
+
+  <div class="col-12 mt-4 text-end">
+    <%= link_to "Hủy", kanjis_path, class: "btn btn-light rounded-pill px-4 me-2" %>
+    <%= f.submit "Lưu Kanji", class: "btn btn-primary rounded-pill px-5 shadow-sm" %>
+  </div>
+<% end %>

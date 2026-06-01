@@ -1,0 +1,50 @@
+<div class="container py-5" data-controller="kanji-quiz">
+  <div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <%= link_to clear_quiz_session_kanjis_path, class: "btn btn-link text-muted text-decoration-none" do %>
+          <i class="bi bi-arrow-left"></i> Thoát luyện tập
+        <% end %>
+        <div class="progress flex-grow-1 mx-4" style="height: 10px; border-radius: 5px;">
+          <div class="progress-bar bg-success transition-all" data-kanji-quiz-target="progressBar" style="width: 0%"></div>
+        </div>
+        <span class="badge bg-light text-dark shadow-sm px-3" data-kanji-quiz-target="scoreBadge">Điểm: 0</span>
+      </div>
+
+      <div class="card shadow-lg border-0 rounded-4 p-5 mb-4 quiz-container">
+        <div data-kanji-quiz-target="questionArea">
+          <p class="text-muted small mb-2">Chọn ý nghĩa đúng của Kanji sau:</p>
+          <h1 class="display-1 fw-bold text-primary mb-5" data-kanji-quiz-target="questionText">...</h1>
+          
+          <div class="row g-3" data-kanji-quiz-target="optionsContainer">
+            <!-- Đáp án sẽ được render từ Stimulus -->
+          </div>
+        </div>
+
+        <div class="d-none" data-kanji-quiz-target="resultArea">
+          <i class="bi bi-trophy display-1 text-warning mb-3"></i>
+          <h2 class="fw-bold">Hoàn thành bài tập!</h2>
+          <p class="text-muted mb-4">Bạn đã trả lời hết các Kanji được chọn.</p>
+          <%= link_to "Luyện tập lại", quiz_kanjis_path(jlpt_level: params[:jlpt_level]), class: "btn btn-primary btn-lg rounded-pill px-5" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .quiz-container { min-height: 400px; display: flex; flex-direction: column; justify-content: center; }
+  .option-btn { 
+    transition: all 0.2s; 
+    border: 2px solid #f0f0f0; 
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+  .option-btn:hover { transform: translateY(-3px); border-color: #0d6efd; background-color: #f8fbff; }
+  .transition-all { transition: all 0.4s ease; }
+  .correct-flash { background-color: #d1fae5 !important; border-color: #10b981 !important; color: #065f46 !important; }
+  .wrong-flash { background-color: #fee2e2 !important; border-color: #ef4444 !important; color: #991b1b !important; }
+</style>
+
+<%# Lưu ý: Cần tạo stimulus controller app/javascript/controllers/kanji_quiz_controller.js tương tự quiz_controller.js %>
+<input type="hidden" id="quiz-params" data-jlpt="<%= params[:jlpt_level] %>">

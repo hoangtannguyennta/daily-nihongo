@@ -4,8 +4,18 @@ source "https://rubygems.org"
 gem "rails", "~> 8.1.3"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
-# Use sqlite3 as the database for Active Record
-gem "sqlite3", ">= 2.1"
+
+# ==================== CẤU HÌNH DATABASE CHIA THEO MÔ TRƯỜNG ====================
+group :development, :test do
+  # Dưới local (Development) và khi chạy Test sẽ dùng SQLite3 cho nhẹ, tiện lợi
+  gem "sqlite3", ">= 2.1"
+end
+
+group :production do
+  # Khi đẩy lên Render (Production) sẽ tự động kích hoạt thư viện PostgreSQL này để kết nối Aiven
+  gem "pg"
+end
+# ==============================================================================
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]

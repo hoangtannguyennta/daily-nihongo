@@ -31,7 +31,7 @@ class OtpVerificationsController < ApplicationController
         redirect_to root_path, notice: "Tài khoản của bạn đã được xác thực."
       else
         @user.resend_otp!
-        UserMailer.welcome_email(@user).deliver_now
+        UserMailer.welcome_email(@user).deliver_later
         redirect_to new_otp_verification_path(email: @user.email), notice: "Mã xác thực mới đã được gửi đến email của bạn."
       end
     else

@@ -84,3 +84,5 @@ end
 gem "bcrypt", "~> 3.1"
 
 gem "dotenv-rails"
+
+gem "mailjet"

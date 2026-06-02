@@ -11,7 +11,7 @@ class SessionsController < ApplicationController
         session[:user_id] = user.id
         redirect_to root_path, notice: "Login thành công"
       else
-        UserMailer.welcome_email(user).deliver_later # Gửi lại mã nếu chưa verify
+        UserMailer.welcome_email(user).deliver_now # Gửi lại mã nếu chưa verify
         redirect_to new_otp_verification_path(email: user.email), alert: "Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email."
       end
     else

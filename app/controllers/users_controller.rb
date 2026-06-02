@@ -53,6 +53,6 @@ class UsersController < ApplicationController
 
   def user_params
     # Cho phép password có thể để trống khi update nếu không muốn đổi mật khẩu
-    params.require(:user).permit(:email, :password, :password_confirmation).compact_blank
+    params.require(:user).permit(:email, :password, :password_confirmation, :role).compact_blank
   end
 end

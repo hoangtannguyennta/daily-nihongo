@@ -16,6 +16,7 @@
           <thead>
             <tr>
               <th class="ps-4">Email người dùng</th>
+              <th class="text-center">Vai trò</th>
               <th class="text-center" style="width: 200px;">Thao tác</th>
             </tr>
           </thead>
@@ -29,6 +30,11 @@
                     </div>
                     <span class="fw-bold text-dark"><%= user.email %></span>
                   </div>
+                </td>
+                <td class="text-center">
+                  <span class="badge rounded-pill <%= user.role == 'admin' ? 'bg-danger' : 'bg-info' %>">
+                    <%= user.role == 'admin' ? 'Admin' : 'User' %>
+                  </span>
                 </td>
                 <td class="text-center pe-4">
                   <%= link_to edit_user_path(user), class: "btn-action-custom btn-edit-custom me-2" do %>

@@ -88,18 +88,30 @@ Rails.application.configure do
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 
-  config.action_mailer.delivery_method = :mailjet_api
+# ====================================================================
+  # CẤU HÌNH GỬI MAIL QUA MAILJET TRÊN RENDER (ĐÃ CHUẨN HÓA)
+  # ====================================================================
+  
+  # 1. Ép hiển thị lỗi nếu gửi mail thất bại lên log Render
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.perform_deliveries = true
+
+  # 2. Đổi URL mặc định của ứng dụng trên môi trường Production
+  config.action_mailer.default_url_options = { host: "daily-nihongo.onrender.com" }
+
+  # 3. Sử dụng phương thức :smtp để ăn khớp với cấu hình cổng 2587 bên dưới
+  config.action_mailer.delivery_method = :smtp
 
   config.action_mailer.smtp_settings = {
     address:              "in-v3.mailjet.com",
-    port:                 2587,                   # Cổng 2587 thần thánh của Mailjet né bộ chặn Render
-    domain:               "mozmail.com",
+    port:                 2587,                   # Cổng thần thánh né bộ chặn Render
+    domain:               "mozmail.com",          # Domain bí danh Firefox Relay đã cấu hình
     user_name:            ENV["MAILJET_API_KEY"],
     password:             ENV["MAILJET_SECRET_KEY"],
     authentication:       "plain",
     enable_starttls_auto: true
   }
 
-  # Luồng xử lý ngầm siêu tốc bằng RAM của anh em mình
-  config.active_job.queue_adapter = :async
+  # 4. Sử dụng Solid Queue (lưu database) thay vì :async (lưu RAM) để tránh mất mail khi Render sleep
+  config.active_job.queue_adapter = :solid_queue
 end

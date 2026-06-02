@@ -64,13 +64,13 @@ class VocabulariesController < ApplicationController
       @vocabulary.audio.purge
     end
 
-    # Handle new image attachments
-    if v_params[:images].present?
-      @vocabulary.images.attach(v_params[:images])
-    end
-
     # CHỖ THAY ĐỔI: Chạy logic update trước, rồi mới respond_to dựa trên kết quả
     if @vocabulary.update(v_params.except(:images, :attachments_to_purge))
+        # Handle new image attachments
+        if v_params[:images].present?
+          @vocabulary.images.attach(v_params[:images])
+        end
+
       respond_to do |format|
         format.html {
           redirect_to @vocabulary,

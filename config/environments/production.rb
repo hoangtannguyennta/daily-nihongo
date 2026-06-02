@@ -7,7 +7,7 @@ Rails.application.configure do
   config.enable_reloading = false
 
   # Eager load code on boot for better performance and memory savings (ignored by Rake tasks).
-  config.eager_load = false
+  config.eager_load = true
 
   # Full error reports are disabled.
   config.consider_all_requests_local = false
@@ -51,7 +51,6 @@ Rails.application.configure do
 
   # Replace the default in-process and non-durable queuing backend for Active Job.
   config.active_job.queue_adapter = :solid_queue
-  config.solid_queue.connects_to = { database: { writing: :queue } }
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
@@ -88,10 +87,10 @@ Rails.application.configure do
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 
-# ====================================================================
+  # ====================================================================
   # CẤU HÌNH GỬI MAIL QUA MAILJET TRÊN RENDER (ĐÃ CHUẨN HÓA)
   # ====================================================================
-  
+
   # 1. Ép hiển thị lỗi nếu gửi mail thất bại lên log Render
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.perform_deliveries = true
@@ -103,14 +102,15 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :smtp
 
   config.action_mailer.smtp_settings = {
-    address:              "in-v3.mailjet.com",
-    port:                 2587,                   # Cổng thần thánh né bộ chặn Render
-    domain:               "mozmail.com",          # Domain bí danh Firefox Relay đã cấu hình
-    user_name:            ENV["MAILJET_API_KEY"],
-    password:             ENV["MAILJET_SECRET_KEY"],
-    authentication:       "plain",
-    enable_starttls_auto: true
-  }
+      address:              "in-v3.mailjet.com",
+      port:                 465,                    # ĐỔI THÀNH CỔNG 465 (SSL)
+      tls:                  true,                   # THÊM DÒNG NÀY
+      domain:               "mozmail.com",
+      user_name:            ENV["MAILJET_API_KEY"],
+      password:             ENV["MAILJET_SECRET_KEY"],
+      authentication:       "plain",
+      enable_starttls_auto: false                   # ĐỔI THÀNH FALSE KHI DÙNG 465
+    }
 
   # 4. Sử dụng Solid Queue (lưu database) thay vì :async (lưu RAM) để tránh mất mail khi Render sleep
   config.active_job.queue_adapter = :solid_queue

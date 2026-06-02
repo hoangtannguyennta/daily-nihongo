@@ -69,7 +69,11 @@
             <th class="text-uppercase small fw-bold text-muted">Ý nghĩa</th>
             <th class="text-center">Bài học</th>
             <th class="text-center text-uppercase small fw-bold text-muted">Minh họa</th>
-            <th class="text-end pe-4 text-uppercase small fw-bold text-muted">Thao tác</th>
+            <%
+              if current_user&.role == "admin"
+                %><th class="text-end pe-4 text-uppercase small fw-bold text-muted">Thao tác</th><%
+              end
+            %>
           </tr>
         </thead>
         <tbody>
@@ -128,27 +132,29 @@
                   <% end %>
                 </div>
               </td>
-              <td class="text-end pe-4 action-cell">
-                <div class="dropdown">
-                  <button class="btn btn-light btn-sm rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown">
-                    <i class="bi bi-three-dots-vertical"></i>
-                  </button>
-                  <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                    <li>
-                      <%= link_to edit_vocabulary_path(vocabulary), class: "dropdown-item text-primary" do %>
-                        <i class="bi bi-pencil-square me-2"></i> Chỉnh sửa
-                      <% end %>
-                    </li>
-                    <li>
-                      <%= button_to vocabulary, method: :delete, 
-                          form: { data: { turbo_confirm: "Xóa '#{vocabulary.word}'?" } },
-                          class: "dropdown-item text-danger border-0 bg-transparent w-100 text-start" do %>
-                        <i class="bi bi-trash3 me-2"></i> Xóa
-                      <% end %>
-                    </li>
-                  </ul>
-                </div>
-              </td>
+                <% if current_user&.role == "admin" %>
+                  <td class="text-end pe-4 action-cell">
+                    <div class="dropdown">
+                      <button class="btn btn-light btn-sm rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                      </button>
+                      <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                        <li>
+                          <%= link_to edit_vocabulary_path(vocabulary), class: "dropdown-item text-primary" do %>
+                            <i class="bi bi-pencil-square me-2"></i> Chỉnh sửa
+                          <% end %>
+                        </li>
+                        <li>
+                          <%= button_to vocabulary, method: :delete, 
+                              form: { data: { turbo_confirm: "Xóa '#{vocabulary.word}'?" } },
+                              class: "dropdown-item text-danger border-0 bg-transparent w-100 text-start" do %>
+                            <i class="bi bi-trash3 me-2"></i> Xóa
+                          <% end %>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                <% end %>
             </tr>
           <% end %>
           <% end %>

@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   get "dashboard/index"
-  root "kanas#index"
+  root "dashboard#index"
 
   resources :kanas do
     collection do

@@ -49,58 +49,54 @@ class VocabulariesController < ApplicationController
 
   # PATCH/PUT /vocabularies/1 or /vocabularies/1.json
   def update
-    respond_to do |format|
-      v_params = vocabulary_params
+    v_params = vocabulary_params
 
-      # Handle existing image deletions
-      if v_params[:attachments_to_purge].present?
-        v_params[:attachments_to_purge].each do |signed_id|
-          blob = ActiveStorage::Blob.find_signed(signed_id)
-          @vocabulary.images.find_by(blob_id: blob.id)&.purge if blob
-        end
+    # Handle existing image deletions
+    if v_params[:attachments_to_purge].present?
+      v_params[:attachments_to_purge].each do |signed_id|
+        blob = ActiveStorage::Blob.find_signed(signed_id)
+        @vocabulary.images.find_by(blob_id: blob.id)&.purge if blob
       end
+    end
 
-      # Handle audio deletion
-      if params[:vocabulary][:purge_audio] == "1" # Vẫn lấy từ params vì ko có trong whitelist permit
-        @vocabulary.audio.purge
-      end
+    # Handle audio deletion
+    if params[:vocabulary][:purge_audio] == "1"
+      @vocabulary.audio.purge
+    end
 
-      # Handle new image attachments (KHÔNG cho update overwrite)
-      if v_params[:images].present?
-        @vocabulary.images.attach(v_params[:images])
-      end
+    # Handle new image attachments
+    if v_params[:images].present?
+      @vocabulary.images.attach(v_params[:images])
+    end
 
-      # Update remaining vocabulary attributes (loại bỏ images và attachments_to_purge để tránh lỗi)
-      if @vocabulary.update(v_params.except(:images, :attachments_to_purge))
-
+    # CHỖ THAY ĐỔI: Chạy logic update trước, rồi mới respond_to dựa trên kết quả
+    if @vocabulary.update(v_params.except(:images, :attachments_to_purge))
+      respond_to do |format|
         format.html {
           redirect_to @vocabulary,
           notice: "Từ vựng đã được cập nhật thành công.",
           status: :see_other
         }
-
         format.json {
           render :show,
           status: :ok,
           location: @vocabulary
         }
-
-      else
-
+      end
+    else
+      respond_to do |format|
         format.html {
           render :edit,
           status: :unprocessable_entity
         }
-
         format.json {
           render json: @vocabulary.errors,
           status: :unprocessable_entity
         }
-
       end
     end
   end
-
+  
   # DELETE /vocabularies/1 or /vocabularies/1.json
   def destroy
     @vocabulary.destroy!

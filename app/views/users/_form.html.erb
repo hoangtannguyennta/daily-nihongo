@@ -1,0 +1,31 @@
+<%= form_with(model: user) do |form| %>
+  <% if user.errors.any? %>
+    <div class="alert alert-danger border-0 shadow-sm mb-4">
+      <h6 class="fw-bold"><%= pluralize(user.errors.count, "lỗi") %> xảy ra:</h6>
+      <ul class="mb-0 small">
+        <% user.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :email, "Địa chỉ Email", class: "form-label fw-bold small text-muted" %>
+    <%= form.email_field :email, class: "form-control form-control-lg bg-light border-0 shadow-sm", placeholder: "example@gmail.com" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :password, user.new_record? ? "Mật khẩu" : "Mật khẩu mới (để trống nếu không đổi)", class: "form-label fw-bold small text-muted" %>
+    <%= form.password_field :password, class: "form-control form-control-lg bg-light border-0 shadow-sm" %>
+  </div>
+
+  <div class="mb-4">
+    <%= form.label :password_confirmation, "Xác nhận mật khẩu", class: "form-label fw-bold small text-muted" %>
+    <%= form.password_field :password_confirmation, class: "form-control form-control-lg bg-light border-0 shadow-sm" %>
+  </div>
+
+  <div class="d-grid gap-2 mt-4">
+    <%= form.submit "Lưu thông tin", class: "btn btn-primary btn-lg rounded-pill fw-bold shadow" %>
+  </div>
+<% end %>

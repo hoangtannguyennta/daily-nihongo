@@ -22,7 +22,7 @@ Rails.application.routes.draw do
   end
   resources :posts
   resources :sessions, only: [ :new, :create, :destroy ]
-  resources :users, only: [ :new, :create ]
+  resources :users, only: [ :new, :create, :index, :edit, :update, :destroy ]
   resources :user_vocabularies do
     collection do
       get :progress

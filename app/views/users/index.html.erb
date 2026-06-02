@@ -1,0 +1,48 @@
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 mb-0 text-dark fw-bold">Quản lý người dùng</h1>
+      <p class="text-muted small mb-0">Danh sách tất cả thành viên trong hệ thống</p>
+    </div>
+    <%= link_to new_user_path, class: "btn btn-primary rounded-pill px-4 fw-bold shadow-sm" do %>
+      <i class="bi bi-person-plus me-2"></i>Thêm người dùng
+    <% end %>
+  </div>
+
+  <div class="card dashboard-card border-0">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table vocab-table align-middle mb-0">
+          <thead>
+            <tr>
+              <th class="ps-4">Email người dùng</th>
+              <th class="text-center" style="width: 200px;">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @users.each do |user| %>
+              <tr>
+                <td class="ps-4">
+                  <div class="d-flex align-items-center">
+                    <div class="stat-icon-box bg-light text-primary sm-icon me-3" style="width: 40px; height: 40px;">
+                      <i class="bi bi-person"></i>
+                    </div>
+                    <span class="fw-bold text-dark"><%= user.email %></span>
+                  </div>
+                </td>
+                <td class="text-center pe-4">
+                  <%= link_to edit_user_path(user), class: "btn-action-custom btn-edit-custom me-2" do %>
+                    <i class="bi bi-pencil-square"></i> Sửa
+                  <% end %>
+                  <%= link_to user_path(user), class: "btn-action-custom btn-delete-custom", data: { turbo_method: :delete, turbo_confirm: 'Bạn có chắc chắn muốn xóa người dùng này?' } do %>
+                    <i class="bi bi-trash"></i> Xóa
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   before_action :set_user, only: %i[edit update destroy]
+  layout :resolve_layout
 
   def index
     @users = User.all
@@ -36,6 +37,15 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def resolve_layout
+    case action_name
+    when "new", "create"
+      "application" # Layout mặc định cho trang Signup công khai
+    else
+      "admin"       # Layout có Sidebar cho các trang quản lý (Index, Edit)
+    end
+  end
 
   def set_user
     @user = User.find(params[:id])

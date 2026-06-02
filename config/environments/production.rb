@@ -109,4 +109,8 @@ Rails.application.configure do
 
   # 4. Sử dụng Solid Queue (lưu database) thay vì :async (lưu RAM) để tránh mất mail khi Render sleep
   # config.active_job.queue_adapter = :solid_queue
+  # 
+  ## Tắt luôn bộ phân tích ảnh ngầm để tránh sập do thiếu thư viện đồ họa trên Render Free
+  config.active_storage.analyzers = []
+  config.active_storage.previewers = []
 end

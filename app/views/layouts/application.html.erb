@@ -262,11 +262,6 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarMain">
         <ul class="navbar-nav ms-auto">
-          <% if logged_in?%>
-            <li class="nav-item">
-              <%= link_to "Người dùng", users_path, class: "nav-link fw-bold #{'active text-primary' if controller_name == 'users'}" %>
-            </li>
-          <% end %>
           <% if logged_in? %>
             <li class="nav-item">
               <%= link_to "Bảng điều khiển", dashboard_index_path, class: "nav-link fw-bold #{'active text-primary' if controller_name == 'dashboard'}" %>

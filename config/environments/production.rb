@@ -94,23 +94,18 @@ Rails.application.configure do
   # 1. Ép hiển thị lỗi nếu gửi mail thất bại lên log Render
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.perform_deliveries = true
-
-  # 2. Đổi URL mặc định của ứng dụng trên môi trường Production
   config.action_mailer.default_url_options = { host: "daily-nihongo.onrender.com" }
-
-  # 3. Sử dụng phương thức :smtp để ăn khớp với cấu hình cổng 2587 bên dưới
   config.action_mailer.delivery_method = :smtp
 
   config.action_mailer.smtp_settings = {
-      address:              "in-v3.mailjet.com",
-      port:                 465,                    # ĐỔI THÀNH CỔNG 465 (SSL)
-      tls:                  true,                   # THÊM DÒNG NÀY
-      domain:               "mozmail.com",
-      user_name:            ENV["MAILJET_API_KEY"],
-      password:             ENV["MAILJET_SECRET_KEY"],
-      authentication:       "plain",
-      enable_starttls_auto: false                   # ĐỔI THÀNH FALSE KHI DÙNG 465
-    }
+    address:              "in-v3.mailjet.com",
+    port:                 2525,                   # Đổi sang cổng custom 2525 thần thánh
+    domain:               "mozmail.com",
+    user_name:            ENV["MAILJET_API_KEY"],
+    password:             ENV["MAILJET_SECRET_KEY"],
+    authentication:       "plain",
+    enable_starttls_auto: true                    # Bật lại cái này vì cổng 2525 chạy TLS
+  }
 
   # 4. Sử dụng Solid Queue (lưu database) thay vì :async (lưu RAM) để tránh mất mail khi Render sleep
   # config.active_job.queue_adapter = :solid_queue

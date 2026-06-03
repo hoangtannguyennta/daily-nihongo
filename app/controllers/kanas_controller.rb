@@ -57,9 +57,24 @@ class KanasController < ApplicationController
         kanas_scope = Kana.all
         kanas_scope = kanas_scope.where(kind: params[:kind]) if params[:kind].present? && %w[hiragana katakana].include?(params[:kind])
 
-        # Lấy một chữ cái ngẫu nhiên làm câu hỏi
-        correct = kanas_scope.order("RANDOM()").first
+        # Khởi tạo session lưu các ID đã xuất hiện nếu chưa có
+        session[:shown_kana_ids] ||= []
+
+        # Lọc bỏ các chữ cái đã hiển thị trong phiên làm việc này
+        available_kanas = kanas_scope.where.not(id: session[:shown_kana_ids])
+
+        # Nếu đã hiển thị hết danh sách, reset các ID thuộc phạm vi này để bắt đầu vòng mới
+        if available_kanas.empty?
+          session[:shown_kana_ids] -= kanas_scope.pluck(:id)
+          available_kanas = kanas_scope
+        end
+
+        # Lấy một chữ cái ngẫu nhiên từ danh sách còn lại
+        correct = available_kanas.order("RANDOM()").first
         return render json: { question: "Hết dữ liệu", options: [], correct: "" } unless correct
+
+        # Thêm ID của câu hỏi hiện tại vào session
+        session[:shown_kana_ids] << correct.id
 
         # Lấy 3 đáp án sai ngẫu nhiên
         wrong = kanas_scope.where.not(id: correct.id).order("RANDOM()").limit(3)

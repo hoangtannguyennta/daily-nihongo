@@ -163,16 +163,16 @@
         <% end %>
 
         <div class="sidebar-section-title">Quản lý nội dung</div>
-        <%= link_to users_path, class: "nav-link-admin #{'active' if controller_name == 'users'}" do %>
+        <%= link_to admin_users_path, class: "nav-link-admin #{'active' if controller_name == 'users'}" do %>
           <i class="bi bi-people"></i> Người dùng
         <% end %>
-        <%= link_to vocabularies_path, class: "nav-link-admin #{'active' if controller_name == 'vocabularies'}" do %>
+        <%= link_to admin_vocabularies_path, class: "nav-link-admin #{'active' if controller_name == 'vocabularies'}" do %>
           <i class="bi bi-book"></i> Từ vựng
         <% end %>
-        <%= link_to kanjis_path, class: "nav-link-admin #{'active' if controller_name == 'kanjis'}" do %>
+        <%= link_to admin_kanjis_path, class: "nav-link-admin #{'active' if controller_name == 'kanjis'}" do %>
           <i class="bi bi-translate"></i> Kanji
         <% end %>
-        <%= link_to kanas_path, class: "nav-link-admin #{'active' if controller_name == 'kanas'}" do %>
+        <%= link_to admin_kanas_path, class: "nav-link-admin #{'active' if controller_name == 'kanas'}" do %>
           <i class="bi bi-alphabet"></i> Bảng chữ cái
         <% end %>
 

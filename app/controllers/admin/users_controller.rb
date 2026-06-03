@@ -1,4 +1,4 @@
-class UsersController < ApplicationController
+class Admin::UsersController < ApplicationController
   before_action :set_user, only: %i[edit update destroy]
   layout :resolve_layout
 
@@ -9,6 +9,7 @@ class UsersController < ApplicationController
   def new
     @user = User.new
   end
+
 
   def create
     @user = User.new(user_params)

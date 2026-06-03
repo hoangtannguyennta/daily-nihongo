@@ -1,4 +1,4 @@
-<%= form_with(model: user) do |form| %>
+<%= form_with(model: [:admin, @user]) do |form| %>
   <% if user.errors.any? %>
     <div class="alert alert-danger border-0 shadow-sm mb-4">
       <h6 class="fw-bold"><%= pluralize(user.errors.count, "lỗi") %> xảy ra:</h6>

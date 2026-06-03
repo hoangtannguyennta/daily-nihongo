@@ -4,7 +4,7 @@
       <h1 class="h3 mb-0 text-dark fw-bold">Quản lý người dùng</h1>
       <p class="text-muted small mb-0">Danh sách tất cả thành viên trong hệ thống</p>
     </div>
-    <%= link_to new_user_path, class: "btn btn-primary rounded-pill px-4 fw-bold shadow-sm" do %>
+    <%= link_to new_admin_user_path, class: "btn btn-primary rounded-pill px-4 fw-bold shadow-sm" do %>
       <i class="bi bi-person-plus me-2"></i>Thêm người dùng
     <% end %>
   </div>
@@ -37,10 +37,10 @@
                   </span>
                 </td>
                 <td class="text-center pe-4">
-                  <%= link_to edit_user_path(user), class: "btn-action-custom btn-edit-custom me-2" do %>
+                  <%= link_to edit_admin_user_path(user), class: "btn-action-custom btn-edit-custom me-2" do %>
                     <i class="bi bi-pencil-square"></i> Sửa
                   <% end %>
-                  <%= link_to user_path(user), class: "btn-action-custom btn-delete-custom", data: { turbo_method: :delete, turbo_confirm: 'Bạn có chắc chắn muốn xóa người dùng này?' } do %>
+                  <%= link_to admin_user_path(user), class: "btn-action-custom btn-delete-custom", data: { turbo_method: :delete, turbo_confirm: 'Bạn có chắc chắn muốn xóa người dùng này?' } do %>
                     <i class="bi bi-trash"></i> Xóa
                   <% end %>
                 </td>

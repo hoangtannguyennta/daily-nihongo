@@ -11,7 +11,7 @@
             <p class="text-muted small">Tham gia cùng cộng đồng JP Learning ngay hôm nay</p>
           </div>
 
-          <%= form_with model: @user, local: true do |form| %>
+          <%= form_with model: [:admin, @user], local: true do |form| %>
             <% if @user.errors.any? %>
               <div class="alert alert-danger border-0 small py-2">
                 <ul class="mb-0 ps-3">
@@ -19,7 +19,7 @@
                     <li><%= message %></li>
                   <% end %>
                 </ul>
-              </div>
+              </div>  
             <% end %>
 
             <div class="mb-3">

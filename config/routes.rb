@@ -22,7 +22,6 @@ Rails.application.routes.draw do
   end
   resources :posts
   resources :sessions, only: [ :new, :create, :destroy ]
-  resources :users, only: [ :new, :create, :index, :edit, :update, :destroy ]
   resources :user_vocabularies do
     collection do
       get :progress
@@ -49,6 +48,10 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resource :dashboards, controller: "dashboards", only: [ :show ]
+    resources :users, only: [ :new, :create, :index, :edit, :update, :destroy ]
+    resources :vocabularies
+    resources :kanjis
+    resources :kanas
   end
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

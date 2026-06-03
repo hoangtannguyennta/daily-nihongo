@@ -28,14 +28,6 @@
             </div>
 
             <div class="mb-3">
-              <%= form.label :role, "Vai trò", class: "form-label small fw-bold text-secondary" %>
-              <%= form.select :role, 
-                  [['User', 'user'], ['Admin', 'admin']], 
-                  { selected: 'user' }, 
-                  { class: "form-select form-select-lg bg-light border-0 fs-6" } %>
-            </div>
-
-            <div class="mb-3">
               <%= form.label :password, "Mật khẩu", class: "form-label small fw-bold text-secondary" %>
               <%= form.password_field :password, required: true, class: "form-control form-control-lg bg-light border-0 fs-6", placeholder: "••••••••" %>
             </div>

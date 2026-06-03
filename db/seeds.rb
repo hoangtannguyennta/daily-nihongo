@@ -67,6 +67,38 @@ kanas = [
   { character: "を", romaji: "wo", kind: "hiragana" },
   { character: "ん", romaji: "n", kind: "hiragana" },
 
+  # Hiragana với dakuten (tenten)
+  { character: "が", romaji: "ga", kind: "hiragana" },
+  { character: "ぎ", romaji: "gi", kind: "hiragana" },
+  { character: "ぐ", romaji: "gu", kind: "hiragana" },
+  { character: "げ", romaji: "ge", kind: "hiragana" },
+  { character: "ご", romaji: "go", kind: "hiragana" },
+
+  { character: "ざ", romaji: "za", kind: "hiragana" },
+  { character: "じ", romaji: "ji", kind: "hiragana" },
+  { character: "ず", romaji: "zu", kind: "hiragana" },
+  { character: "ぜ", romaji: "ze", kind: "hiragana" },
+  { character: "ぞ", romaji: "zo", kind: "hiragana" },
+
+  { character: "だ", romaji: "da", kind: "hiragana" },
+  { character: "ぢ", romaji: "ji", kind: "hiragana" },
+  { character: "づ", romaji: "zu", kind: "hiragana" },
+  { character: "で", romaji: "de", kind: "hiragana" },
+  { character: "ど", romaji: "do", kind: "hiragana" },
+
+  { character: "ば", romaji: "ba", kind: "hiragana" },
+  { character: "び", romaji: "bi", kind: "hiragana" },
+  { character: "ぶ", romaji: "bu", kind: "hiragana" },
+  { character: "べ", romaji: "be", kind: "hiragana" },
+  { character: "ぼ", romaji: "bo", kind: "hiragana" },
+
+  # Hiragana với handakuten (maru)
+  { character: "ぱ", romaji: "pa", kind: "hiragana" },
+  { character: "ぴ", romaji: "pi", kind: "hiragana" },
+  { character: "ぷ", romaji: "pu", kind: "hiragana" },
+  { character: "ぺ", romaji: "pe", kind: "hiragana" },
+  { character: "ぽ", romaji: "po", kind: "hiragana" },
+
   # Katakana
   { character: "ア", romaji: "a", kind: "katakana" },
   { character: "イ", romaji: "i", kind: "katakana" },
@@ -122,7 +154,39 @@ kanas = [
 
   { character: "ワ", romaji: "wa", kind: "katakana" },
   { character: "ヲ", romaji: "wo", kind: "katakana" },
-  { character: "ン", romaji: "n", kind: "katakana" }
+  { character: "ン", romaji: "n", kind: "katakana" },
+
+  # Katakana với dakuten (tenten)
+  { character: "ガ", romaji: "ga", kind: "katakana" },
+  { character: "ギ", romaji: "gi", kind: "katakana" },
+  { character: "グ", romaji: "gu", kind: "katakana" },
+  { character: "ゲ", romaji: "ge", kind: "katakana" },
+  { character: "ゴ", romaji: "go", kind: "katakana" },
+
+  { character: "ザ", romaji: "za", kind: "katakana" },
+  { character: "ジ", romaji: "ji", kind: "katakana" },
+  { character: "ズ", romaji: "zu", kind: "katakana" },
+  { character: "ゼ", romaji: "ze", kind: "katakana" },
+  { character: "ゾ", romaji: "zo", kind: "katakana" },
+
+  { character: "ダ", romaji: "da", kind: "katakana" },
+  { character: "ヂ", romaji: "ji", kind: "katakana" },
+  { character: "ヅ", romaji: "zu", kind: "katakana" },
+  { character: "デ", romaji: "de", kind: "katakana" },
+  { character: "ド", romaji: "do", kind: "katakana" },
+
+  { character: "バ", romaji: "ba", kind: "katakana" },
+  { character: "ビ", romaji: "bi", kind: "katakana" },
+  { character: "ブ", romaji: "bu", kind: "katakana" },
+  { character: "ベ", romaji: "be", kind: "katakana" },
+  { character: "ボ", romaji: "bo", kind: "katakana" },
+
+  # Katakana với handakuten (maru)
+  { character: "パ", romaji: "pa", kind: "katakana" },
+  { character: "ピ", romaji: "pi", kind: "katakana" },
+  { character: "プ", romaji: "pu", kind: "katakana" },
+  { character: "ペ", romaji: "pe", kind: "katakana" },
+  { character: "ポ", romaji: "po", kind: "katakana" }
 ]
 
 kanas.each do |kana|

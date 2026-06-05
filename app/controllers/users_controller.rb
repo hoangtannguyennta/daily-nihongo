@@ -5,12 +5,14 @@ class UsersController < ApplicationController
 
   def create
     @user = User.new(user_params)
-    # Gán vai trò mặc định là user
-    @user.role = "user" if @user.respond_to?(:role=)
 
-    if @user.save
-      session[:user_id] = @user.id
-      redirect_to root_path, notice: "Chào mừng bạn đến với Daily Nihongo! Đăng ký thành công."
+    if @user.valid?
+      # Lưu thông tin tạm thời vào session thay vì database
+      session[:pending_user] = user_params.to_h
+      # Tạo mã OTP ngẫu nhiên (Giả lập gửi qua email)
+      session[:otp_code] = (rand(100000..999999)).to_s
+
+      redirect_to new_otp_verification_path, notice: "Mã xác thực OTP đã được gửi! (Mã của bạn là: #{session[:otp_code]})"
     else
       render :new, status: :unprocessable_entity
     end
@@ -19,6 +21,6 @@ class UsersController < ApplicationController
   private
 
   def user_params
-    params.expect(user: [ :username, :email, :password, :password_confirmation ])
+    params.require(:user).permit(:email, :password, :password_confirmation)
   end
 end

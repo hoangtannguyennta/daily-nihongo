@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+      <h2 style="color: #4a90e2; text-align: center;">Xác thực tài khoản của bạn</h2>
+      <p>Chào bạn,</p>
+      <p>Cảm ơn bạn đã đăng ký tham gia học tiếng Nhật tại <strong>Daily Nihongo</strong>.</p>
+      <p>Để hoàn tất đăng ký, vui lòng sử dụng mã xác thực (OTP) bên dưới:</p>
+      <div style="background: #f8f9fa; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #2c3e50; border-radius: 8px; margin: 20px 0;">
+        <%= @otp %>
+      </div>
+      <p style="font-size: 12px; color: #777;">Mã này sẽ hết hạn trong thời gian ngắn. Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email.</p>
+    </div>
+  </body>
+</html>

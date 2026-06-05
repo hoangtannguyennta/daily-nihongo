@@ -1,12 +1,8 @@
-class UserMailer < ActionMailer::Base
-  default from: "23tkik24u@mozmail.com"
+class UserMailer < ApplicationMailer
+  default from: "no-reply@dailynihongo.com"
 
-  def welcome_email(user)
-    @user = user
-
-    mail(
-      to: @user.email,
-      subject: "Mã xác nhận kích hoạt tài khoản - #{@user.otp_code}"
-    )
+  def otp_email(email, otp)
+    @otp = otp
+    mail(to: email, subject: "Mã xác thực đăng ký tài khoản Daily Nihongo")
   end
 end

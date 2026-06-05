@@ -21,6 +21,7 @@ class Admin::KanasController < Admin::AdminController
     end
   end
 
+
   def update
     if @kana.update(kana_params)
       redirect_to admin_kanas_path, notice: "Đã cập nhật chữ cái."

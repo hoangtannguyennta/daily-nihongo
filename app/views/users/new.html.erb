@@ -1,0 +1,63 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-5">
+      <!-- Header giống phong cách Admin -->
+      <div class="text-center mb-4">
+        <div class="stat-icon-box bg-primary text-white mx-auto mb-3 shadow-sm" style="width: 70px; height: 70px; border-radius: 20px; display: flex; align-items: center; justify-content: center;">
+          <i class="bi bi-person-plus-fill fs-2"></i>
+        </div>
+        <h2 class="fw-bold text-dark">Tạo tài khoản mới</h2>
+        <p class="text-muted small">Cùng học tiếng Nhật mỗi ngày</p>
+      </div>
+
+      <!-- Card đăng ký -->
+      <div class="card dashboard-card border-0 p-4 shadow-sm" style="border-radius: 20px;">
+        <div class="card-body">
+          <%= form_with(model: @user, local: true) do |f| %>
+            <% if @user.errors.any? %>
+              <div class="alert alert-danger border-0 rounded-3 mb-4 small">
+                <ul class="mb-0">
+                  <% @user.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+
+            <div class="mb-3">
+              <%= f.label :username, "Tên hiển thị", class: "form-label small fw-bold text-muted text-uppercase" %>
+              <%= f.text_field :username, class: "form-control border-0 bg-light p-3", placeholder: "Ví dụ: Tanjiro", required: true %>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :email, "Địa chỉ Email", class: "form-label small fw-bold text-muted text-uppercase" %>
+              <%= f.email_field :email, class: "form-control border-0 bg-light p-3", placeholder: "email@example.com", required: true %>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :password, "Mật khẩu", class: "form-label small fw-bold text-muted text-uppercase" %>
+              <%= f.password_field :password, class: "form-control border-0 bg-light p-3", placeholder: "••••••••", required: true %>
+            </div>
+
+            <div class="mb-4">
+              <%= f.label :password_confirmation, "Xác nhận mật khẩu", class: "form-label small fw-bold text-muted text-uppercase" %>
+              <%= f.password_field :password_confirmation, class: "form-control border-0 bg-light p-3", placeholder: "••••••••", required: true %>
+            </div>
+
+            <div class="d-grid gap-2">
+              <%= f.submit "Đăng ký thành viên", class: "btn btn-primary rounded-pill fw-bold py-3 shadow-sm" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Link chuyển hướng -->
+      <div class="text-center mt-4">
+        <p class="text-muted small">
+          Bạn đã có tài khoản? 
+          <%= link_to "Đăng nhập ngay", login_path, class: "text-primary fw-bold text-decoration-none" %>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

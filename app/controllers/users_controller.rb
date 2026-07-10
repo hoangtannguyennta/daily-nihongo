@@ -12,12 +12,14 @@ class UsersController < ApplicationController
       # Tạo mã OTP ngẫu nhiên
       session[:otp_code] = nil
 
+      redirect_to root_path, notice: "Đang ký tài khoản thành công"
+
       # session[:otp_code] = (rand(100000..999999)).to_s
 
       # Gửi email thực tế
       # UserMailer.otp_email(@user.email, session[:otp_code]).deliver_now
 
-      redirect_to new_otp_verification_path, notice: "Mã xác thực OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư!"
+      # redirect_to new_otp_verification_path, notice: "Mã xác thực OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư!"
     else
       render :new, status: :unprocessable_entity
     end

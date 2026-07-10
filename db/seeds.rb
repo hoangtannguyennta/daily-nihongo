@@ -9,7 +9,7 @@
 #   end
 require "open-uri"
 
-User.find_or_create_by!(email: "admin@example.com") do |user|
+User.find_or_create_by!(email: "admin@gmail.com") do |user|
   user.username = "Administrator"
   user.password = "12345678"
   user.password_confirmation = "12345678"

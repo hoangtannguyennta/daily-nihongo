@@ -10,7 +10,7 @@
 require "open-uri"
 
 User.find_or_create_by!(email: "admin@example.com") do |user|
-  user.full_name = "Administrator"
+  user.username = "Administrator"
   user.password = "12345678"
   user.password_confirmation = "12345678"
   user.role = :admin

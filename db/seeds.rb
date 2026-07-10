@@ -9,6 +9,15 @@
 #   end
 require "open-uri"
 
+User.find_or_create_by!(email: "admin@example.com") do |user|
+  user.full_name = "Administrator"
+  user.password = "12345678"
+  user.password_confirmation = "12345678"
+  user.role = :admin
+end
+
+puts "✅ Seed admin thành công!"
+
 kanas = [
   # Hiragana
   { character: "あ", romaji: "a", kind: "hiragana" },
